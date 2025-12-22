@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PanelForge - AI-powered comic creation platform. Generate panels, characters, and dialogue with advanced AI. The future of storytelling is here.">
+    <meta name="keywords" content="comic creation, AI comics, panel generator, character generator, storytelling, comic book">
+    <link rel="canonical" href="https://panelforge.com">
+    <title>PanelForge - AI-Powered Comic Creation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0A0E27;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* background image moved to styles.css per contract (removed inline body::before) */
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(107, 46, 159, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(217, 70, 239, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-curve {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .curve-1 {
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.4) 0%, transparent 70%);
+            filter: blur(40px);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .curve-2 {
+            bottom: -10%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(ellipse at center, rgba(217, 70, 239, 0.35) 0%, transparent 70%);
+            filter: blur(35px);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        .curve-3 {
+            top: 40%;
+            left: 10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(107, 46, 159, 0.3) 0%, transparent 70%);
+            filter: blur(30px);
+            border-radius: 50%;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #06B6D4;
+            color: #0A0E27;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            font-weight: 600;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #06B6D4;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #D946EF;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #06B6D4;
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1.25rem;
+            background: transparent;
+            color: #06B6D4;
+            border: 1px solid #06B6D4;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-login:hover {
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-account {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #6B2E9F;
+            background: transparent;
+            color: #D946EF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn-account:hover {
+            background: rgba(107, 46, 159, 0.2);
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid #06B6D4;
+            color: #06B6D4;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.2rem;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        #hero {
+            padding: 4rem 0;
+            text-align: left;
+        }
+
+        .hero-content {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.7) 0%, rgba(10, 14, 39, 0.8) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            border-radius: 16px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(107, 46, 159, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        .hero-text {
+            flex: 1;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.25rem;
+            color: #ffffff;
+            text-shadow: 0 2px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2rem;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(6, 182, 212, 0.6);
+        }
+
+        .hero-image {
+            flex: 1;
+            z-index: 1;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.6) 0%, rgba(10, 14, 39, 0.7) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(107, 46, 159, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.3);
+        }
+
+        .tool-card:hover::before {
+            opacity: 1;
+        }
+
+        .tool-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .tool-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #06B6D4;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tool-card p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 300;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls-section {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.4) 0%, rgba(10, 14, 39, 0.5) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            border-radius: 16px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+            font-weight: 400;
+        }
+
+        .control-group input,
+        .control-group select,
+        .control-group textarea {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: #ffffff;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus,
+        .control-group textarea:focus {
+            outline: none;
+            border-color: #06B6D4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .control-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .control-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #6B2E9F, #8B3EC6);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(107, 46, 159, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(107, 46, 159, 0.6);
+        }
+
+        .btn-tertiary {
+            padding: 0.875rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-tertiary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .status-section {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .status-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #06B6D4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10, 14, 39, 0.6);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+            position: relative;
+        }
+
+        .status-circle::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(#06B6D4 0deg 162deg, transparent 162deg 360deg);
+            z-index: -1;
+        }
+
+        .status-circle span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+        }
+
+        .status-circle strong {
+            font-size: 2rem;
+            color: #06B6D4;
+        }
+
+        .status-bar {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(107, 46, 159, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .status-bar span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(107, 46, 159, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B2E9F, #8B3EC6);
+            width: 70%;
+            border-radius: 6px;
+            box-shadow: 0 0 15px rgba(107, 46, 159, 0.6);
+        }
+
+        .status-preview {
+            width: 250px;
+            height: 150px;
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-preview::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(6, 182, 212, 0.1) 50%, transparent 100%);
+        }
+
+        .status-preview span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 1;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.3);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(10, 14, 39, 0.95), transparent);
+            padding: 1.5rem 1rem 1rem;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #about {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.3) 0%, rgba(10, 14, 39, 0.4) 100%);
+            border-radius: 16px;
+            padding: 5rem 2rem;
+        }
+
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #06B6D4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .about-content p {
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        #contact {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.3) 0%, rgba(10, 14, 39, 0.4) 100%);
+            border-radius: 16px;
+            padding: 5rem 2rem;
+        }
+
+        .contact-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .contact-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #D946EF;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+            font-weight: 400;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(217, 70, 239, 0.3);
+            color: #ffffff;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #D946EF;
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .btn-submit {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #D946EF, #C026D3);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(217, 70, 239, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            align-self: center;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(217, 70, 239, 0.6);
+        }
+
+        footer {
+            background: rgba(10, 14, 39, 0.9);
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 3rem 0 2rem;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: #06B6D4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #06B6D4;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding: 2rem 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 1rem;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: rgba(10, 14, 39, 0.98);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: left 0.3s ease;
+                border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero-content {
+                flex-direction: column;
+                padding: 2rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-section {
+                grid-template-columns: 1fr;
+                justify-items: center;
+            }
+
+            .status-preview {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <div class="glow-curve curve-1"></div>
+    <div class="glow-curve curve-2"></div>
+    <div class="glow-curve curve-3"></div>
+
+    <header role="banner" class="pf-header" data-pf="header">
+        <div class="header-container">
+            <a href="#hero" class="logo" aria-label="PanelForge Home">Panel<span>Forge</span></a>
+            <nav role="navigation" aria-label="Main navigation" class="pf-nav" data-pf="nav">
+                <button class="mobile-menu-toggle pf-mobile-toggle" data-pf="mobile-toggle" aria-expanded="false" aria-controls="pf-mobile-menu" aria-label="Toggle navigation menu">
+                    ?
+                </button>
+                <ul class="nav-menu pf-mobile-menu" id="pf-mobile-menu" role="menu" aria-hidden="true">
+                    <li><a href="index.html" class="active pf-nav-link" data-pf="nav-link" data-nav-key="home">Home</a></li>
+                    <li><a href="create.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="create">Create</a></li>
+                    <li><a href="studio.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="studio">Studio</a></li>
+                    <li><a href="storyboard.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="storyboard">Storyboard</a></li>
+                    <li><a href="preview.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="preview">Preview</a></li>
+                    <li><a href="export.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="export">Export</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="create.html" class="btn-login pf-login" data-pf="login">Login</a>
+                    <button class="btn-account" aria-label="User account">?</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" role="main" class="pf-main" data-pf="main">
+        <section id="hero" aria-labelledby="hero-title">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 id="hero-title">UNLEASH YOUR STORY. AI-POWERED COMIC CREATION.</h1>
+                        <p>Generate panels, characters, and dialogue with advanced AI. The future of storytelling is here.</p>
+                        <a href="#tools" class="btn-primary">START CREATING</a>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://im.runware.ai/image/ws/2/ii/f26d18ae-e48f-4ebd-bff1-fcb25df4e798.jpg" alt="AI-powered comic creation showcase" loading="eager">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tools" aria-labelledby="tools-title">
+            <div class="container">
+                <div class="section-header">
+                    <h2 id="tools-title">FEATURED TOOLS</h2>
+                </div>
+                <div class="tools-grid">
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <img src="https://im.runware.ai/image/ws/2/ii/eed154b4-0029-4cfd-ab45-9346c82a21a0.jpg" alt="AI Character Generator icon" loading="lazy">
+                        </div>
+                        <h3>AI CHARACTER GENERATOR</h3>
+                        <p>Create unique characters with detailed descriptions. Customize appearance, powers, and style.</p>
+                    </article>
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="8" y="8" width="20" height="20" rx="2" stroke="#06B6D4" stroke-width="2"/>
+                                <rect x="32" y="8" width="20" height="20" rx="2" stroke="#D946EF" stroke-width="2"/>
+                                <rect x="56" y="8" width="20" height="20" rx="2" stroke="#6B2E9F" stroke-width="2"/>
+                                <rect x="8" y="32" width="20" height="20" rx="2" stroke="#6B2E9F" stroke-width="2"/>
+                                <rect x="32" y="32" width="20" height="20" rx="2" stroke="#06B6D4" stroke-width="2"/>
+                                <rect x="56" y="32" width="20" height="20" rx="2" stroke="#D946EF" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>SMART PANEL LAYOUTS</h3>
+                        <p>Instantly generate dynamic panel grids and compositions. Optimize flow and storytelling.</p>
+                    </article>
+                    <article class="tool-card">
+                        <div class="tool-icon">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="20" width="60" height="40" rx="4" stroke="#06B6D4" stroke-width="2"/>
+                                <path d="M20 35 L35 35" stroke="#D946EF" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M20 45 L50 45" stroke="#D946EF" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="60" cy="40" r="8" stroke="#6B2E9F" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>DIALOGUE & SCRIPTING</h3>
+                        <p>AI assisted scriptwriting and dialogue generation. Enhance your narrative voice.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="controls" aria-labelledby="controls-title">
+            <div class="container">
+                <div class="section-header">
+                    <h2 id="controls-title">CREATIVE CONTROLS</h2>
+                </div>
+                <div class="controls-section">
+                    <form class="controls-grid" aria-label="Comic creation controls">
+                        <div class="control-group">
+                            <label for="prompt">Enter Prompt...</label>
+                            <input type="text" id="prompt" name="prompt" placeholder="Describe your scene or character..." aria-required="true">
+                        </div>
+                        <div class="control-group">
+                            <label for="art-style">Select Art Style...</label>
+                            <select id="art-style" name="art-style" aria-required="true">
+                                <option value="">Choose style...</option>
+                                <option value="comic">Comic Book</option>
+                                <option value="manga">Manga</option>
+                                <option value="realistic">Realistic</option>
+                                <option value="cartoon">Cartoon</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="character-name">Character Name...</label>
+                            <input type="text" id="character-name" name="character-name" placeholder="Enter character name...">
+                        </div>
+                        <div class="control-group control-group-full">
+                            <label for="scene-description">Scene Description...</label>
+                            <textarea id="scene-description" name="scene-description" placeholder="Describe the scene, mood, and action..."></textarea>
+                        </div>
+                        <div class="control-group">
+                            <label for="page-title">Page Title...</label>
+                            <input type="text" id="page-title" name="page-title" placeholder="Enter page or chapter title...">
+                        </div>
+                    </form>
+                    <div class="button-group">
+                        <button type="button" class="btn-primary">GENERATE PANEL</button>
+                        <button type="button" class="btn-secondary">SAVE DRAFT</button>
+                        <button type="button" class="btn-tertiary">EXPORT</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="status" aria-labelledby="status-title">
+            <div class="container">
+                <div class="section-header">
+                    <h2 id="status-title">SYSTEM STATUS</h2>
+                </div>
+                <div class="status-section">
+                    <div class="status-circle" role="status" aria-label="Generation progress">
+                        <span>GENERATING...</span>
+                        <strong>45%</strong>
+                    </div>
+                    <div class="status-bar">
+                        <span>PROCESSING ASSETS...</span>
+                        <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="status-preview">
+                        <span>LOADING PREVIEW...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="recent" aria-labelledby="recent-title">
+            <div class="container">
+                <div class="section-header">
+                    <h2 id="recent-title">RECENT CREATIONS</h2>
+                </div>
+                <div class="gallery-grid pf-grid" data-pf="grid">
+                    <article class="gallery-item pf-card" data-pf="card" data-card-id="card-1">
+                        <img src="https://im.runware.ai/image/ws/2/ii/edcbc570-4aac-4596-8cf3-e271c62d2052.jpg" alt="Project Alpha - Panel 1" loading="lazy">
+                        <div class="gallery-item-title">PROJECT ALPHA - PANEL 1</div>
+                    </article>
+                    <article class="gallery-item pf-card" data-pf="card" data-card-id="card-2">
+                        <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Neon City Rising" loading="lazy">
+                        <div class="gallery-item-title">NEON CITY RISING</div>
+                    </article>
+                    <article class="gallery-item pf-card" data-pf="card" data-card-id="card-3">
+                        <img src="https://im.runware.ai/image/ws/2/ii/edcbc570-4aac-4596-8cf3-e271c62d2052.jpg" alt="Cybernetic Encounter" loading="lazy">
+                        <div class="gallery-item-title">CYBERNETIC ENCOUNTER</div>
+                    </article>
+                    <article class="gallery-item pf-card" data-pf="card" data-card-id="card-4">
+                        <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Cybernetic Encounter 2" loading="lazy">
+                        <div class="gallery-item-title">CYBERNETIC ENCOUNTER</div>
+                    </article>
+                    <article class="gallery-item pf-card" data-pf="card" data-card-id="card-5">
+                        <img src="https://im.runware.ai/image/ws/2/ii/edcbc570-4aac-4596-8cf3-e271c62d2052.jpg" alt="Cybernetic Encounter 3" loading="lazy">
+                        <div class="gallery-item-title">CYBERNETIC ENCOUNTER</div>
+                    </article>
+                    <article class="gallery-item pf-card" data-pf="card" data-card-id="card-6">
+                        <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Project Alpha - Panel 3" loading="lazy">
+                        <div class="gallery-item-title">PROJECT ALPHA - PANEL 3</div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" aria-labelledby="about-title">
+            <div class="container">
+                <div class="about-content">
+                    <h2 id="about-title">About PanelForge</h2>
+                    <p>PanelForge is revolutionizing comic book creation with cutting-edge AI technology. Our platform empowers creators of all skill levels to bring their stories to life with professional-quality artwork, dynamic layouts, and intelligent scripting tools.</p>
+                    <p>Whether you're a seasoned comic artist or just starting your creative journey, PanelForge provides the tools you need to transform your imagination into stunning visual narratives. Join thousands of creators who are already crafting the next generation of comics.</p>
+                    <p>The future of storytelling is here. Start creating your masterpiece today.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" aria-labelledby="contact-title">
+            <div class="container">
+                <div class="contact-content">
+                    <h2 id="contact-title">Get In Touch</h2>
+                    <form class="contact-form" action="#" method="post">
+                        <div class="form-group">
+                            <label for="contact-name">Name</label>
+                            <input type="text" id="contact-name" name="name" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email</label>
+                            <input type="email" id="contact-email" name="email" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-subject">Subject</label>
+                            <input type="text" id="contact-subject" name="subject" required aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">Message</label>
+                            <textarea id="contact-message" name="message" required aria-required="true"></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">SEND MESSAGE</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PanelForge</h3>
+                <p>AI-powered comic creation platform for the next generation of storytellers.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#hero">Home</a>
+                <a href="services.html">Services</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#tutorials">Tutorials</a>
+                <a href="#documentation">Documentation</a>
+                <a href="#community">Community</a>
+                <a href="#support">Support</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: hello@panelforge.com</p>
+                <p>Support: support@panelforge.com</p>
+                <p>Follow us on social media</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 PanelForge. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script src="app.js" defer></script>
+    <script>
+        (function() {
+            function initIfReady() {
+                if (window.app && typeof window.app.init === 'function') {
+                    window.app.init(document);
+                }
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initIfReady);
+            } else {
+                initIfReady();
+            }
+        })();
+    </script>
+</body>
+</html>
