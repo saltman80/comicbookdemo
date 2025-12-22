@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PanelForge Export - Configure and export your comic creations in multiple formats including PDF, PNG sequences, and print-ready files.">
+    <meta name="keywords" content="comic export, PDF export, PNG sequence, print ready comics, comic download, share comics">
+    <link rel="canonical" href="https://panelforge.com/export">
+    <title>Export Comics - PanelForge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root{
+            /* CSS tokens (minimal set) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 16px;
+            --radius-1: 4px;
+            --radius-2: 8px;
+            --radius-3: 12px;
+            --shadow-1: 0 8px 32px rgba(0,0,0,0.2);
+            --color-primary: #06B6D4;
+            --color-accent: #D946EF;
+            --bg-image: url('https://im.runware.ai/image/ws/2/ii/7db296f5-4a26-4633-8e11-2e115940331d.jpg');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0A0E27;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-image) center center / cover no-repeat fixed;
+            opacity: 0.3;
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(107, 46, 159, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(217, 70, 239, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-curve {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .curve-1 {
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.4) 0%, transparent 70%);
+            filter: blur(40px);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .curve-2 {
+            bottom: -10%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(ellipse at center, rgba(217, 70, 239, 0.35) 0%, transparent 70%);
+            filter: blur(35px);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        .curve-3 {
+            top: 40%;
+            left: 10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(107, 46, 159, 0.3) 0%, transparent 70%);
+            filter: blur(30px);
+            border-radius: 50%;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--color-primary);
+            color: #0A0E27;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            font-weight: 600;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--color-accent);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--color-primary);
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1.25rem;
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-login:hover {
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-account {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #6B2E9F;
+            background: transparent;
+            color: var(--color-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn-account:hover {
+            background: rgba(107, 46, 159, 0.2);
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.2rem;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 5rem;
+            right: 2rem;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(22, 163, 74, 0.95));
+            color: #ffffff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 100;
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-toast .icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .success-toast .close {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            margin-left: 1rem;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-toast .close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .export-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .export-main {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.7) 0%, rgba(10, 14, 39, 0.85) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, var(--color-primary), #6B2E9F) 1;
+            border-radius: 16px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .export-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(107, 46, 159, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .export-sidebar {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.5) 0%, rgba(10, 14, 39, 0.7) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subsection-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .format-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .format-card {
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .format-card.selected {
+            border-color: var(--color-primary);
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
+        }
+
+        .format-card::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(6, 182, 212, 0.4);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .format-card.selected::before {
+            opacity: 1;
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+        }
+
+        .format-card.selected::after {
+            content: '?';
+            position: absolute;
+            top: 6px;
+            right: 9px;
+            color: #0A0E27;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .format-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--color-primary);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+        }
+
+        .format-icon {
+            font-size: 3rem;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .format-card.selected .format-icon {
+            color: var(--color-primary);
+            filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.6));
+        }
+
+        .format-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .config-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .config-select,
+        .config-input {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2306B6D4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 3rem;
+        }
+
+        .config-select:hover,
+        .config-select:focus,
+        .config-input:hover,
+        .config-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            outline: none;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, var(--color-primary), #0891B2);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 31px;
+        }
+
+        .btn-export {
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, var(--color-primary), #0891B2);
+            color: #0A0E27;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(6, 182, 212, 0.6);
+        }
+
+        .btn-export:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-overlay.active {
+            display: flex;
+        }
+
+        .progress-modal {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.95) 0%, rgba(10, 14, 39, 0.98) 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 40px rgba(6, 182, 212, 0.4);
+        }
+
+        .progress-modal h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar-container {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), #0891B2, var(--color-accent));
+            background-size: 200% 100%;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+            animation: progressGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes progressGlow {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .close-progress {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-progress:hover {
+            border-color: var(--color-primary);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .share-section {
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .share-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .share-platforms {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(107, 46, 159, 0.4);
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+        }
+
+        .social-btn:hover {
+            border-color: var(--color-accent);
+            background: rgba(107, 46, 159, 0.2);
+            color: var(--color-accent);
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+
+        .public-link-box {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .link-input {
+            flex: 1;
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-copy {
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--color-primary), #0891B2);
+            color: #0A0E27;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .recent-section {
+            margin-top: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .recent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .recent-item {
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid rgba(107, 46, 159, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .recent-item:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 25px rgba(217, 70, 239, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .recent-thumb {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+
+        .recent-info {
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 14, 39, 0.8);
+        }
+
+        .recent-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .recent-menu {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+
+        .recent-menu:hover {
+            color: var(--color-primary);
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .note-item {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(107, 46, 159, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .note-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(107, 46, 159, 0.3);
+        }
+
+        .note-content {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: 12px;
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            overflow: hidden;
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        footer {
+            background: rgba(10, 14, 39, 0.9);
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 3rem 0 2rem;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--color-primary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding: 2rem 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .export-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .export-sidebar {
+                position: static;
+            }
+
+            .format-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 1rem;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: rgba(10, 14, 39, 0.98);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: left 0.3s ease;
+                border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .export-main {
+                padding: 1.5rem;
+            }
+
+            .format-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .share-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recent-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+
+            .success-toast {
+                right: 1rem;
+                left: 1rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <div class="glow-curve curve-1"></div>
+    <div class="glow-curve curve-2"></div>
+    <div class="glow-curve curve-3"></div>
+
+    <div class="success-toast" role="alert" aria-live="polite" style="display: none;">
+        <div class="icon">?</div>
+        <div>
+            <strong>Export Successful!</strong>
+            <p style="font-size: 0.85rem; margin: 0;">Export Successful! PanelForge</p>
+        </div>
+        <button class="close" aria-label="Close notification">?</button>
+    </div>
+
+    <header role="banner" data-pf="header">
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PanelForge Home">Panel<span>Forge</span></a>
+            <nav class="pf-nav" role="navigation" aria-label="Main navigation" data-pf="nav">
+                <button class="pf-mobile-toggle mobile-menu-toggle" data-pf="mobile-toggle" aria-expanded="false" aria-controls="pf-mobile-menu" aria-label="Toggle navigation menu">
+                    ?
+                </button>
+                <ul class="nav-menu pf-mobile-menu" id="pf-mobile-menu" role="menu" aria-hidden="true">
+                    <li><a href="index.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="home">Home</a></li>
+                    <li><a href="create.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="create">Create</a></li>
+                    <li><a href="studio.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="studio">Studio</a></li>
+                    <li><a href="storyboard.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="storyboard">Storyboard</a></li>
+                    <li><a href="preview.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="preview">Preview</a></li>
+                    <li><a href="export.html" class="pf-nav-link" data-pf="nav-link" data-nav-key="export">Export</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="create.html" class="btn-login pf-login" data-pf="login">Login</a>
+                    <button class="btn-account" aria-label="User account">?</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" role="main">
+        <div class="container">
+            <div class="preview-image">
+                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic page preview" loading="eager">
+            </div>
+
+            <div class="export-layout">
+                <div class="export-main">
+                    <h1 class="section-title">Export Configuration</h1>
+
+                    <section aria-labelledby="format-title">
+                        <h2 id="format-title" class="subsection-title">Premium Cards</h2>
+                        <div class="format-cards">
+                            <div class="format-card selected" data-format="pdf" tabindex="0" role="radio" aria-checked="true">
+                                <div class="format-icon">?</div>
+                                <div class="format-label">PDF</div>
+                            </div>
+                            <div class="format-card" data-format="png" tabindex="0" role="radio" aria-checked="false">
+                                <div class="format-icon">??</div>
+                                <div class="format-label">PNG Sequence</div>
+                            </div>
+                            <div class="format-card" data-format="print" tabindex="0" role="radio" aria-checked="false">
+                                <div class="format-icon">??</div>
+                                <div class="format-label">Print Ready</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section aria-labelledby="settings-title">
+                        <div class="config-grid">
+                            <div class="config-group">
+                                <label for="resolution" class="config-label">Resolution</label>
+                                <select id="resolution" class="config-select">
+                                    <option value="300">High 300dpi</option>
+                                    <option value="150">Medium 150dpi</option>
+                                    <option value="72">Web 72dpi</option>
+                                </select>
+                            </div>
+                            <div class="config-group toggle-group">
+                                <label class="config-label">Bleed</label>
+                                <div class="toggle-switch active" role="switch" aria-checked="true" tabindex="0" aria-label="Bleed toggle"></div>
+                            </div>
+                            <div class="config-group">
+                                <label for="color-profile" class="config-label">Color Profile</label>
+                                <select id="color-profile" class="config-select">
+                                    <option value="cmyk">CMYK</option>
+                                    <option value="rgb">RGB</option>
+                                    <option value="grayscale">Grayscale</option>
+                                </select>
+                            </div>
+                            <div class="config-group toggle-group">
+                                <label class="config-label">Watermark</label>
+                                <div class="toggle-switch" role="switch" aria-checked="false" tabindex="0" aria-label="Watermark toggle"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <button class="btn-export pf-export-start">Export</button>
+
+                    <section class="share-section" aria-labelledby="share-title">
+                        <h2 id="share-title" class="subsection-title">Share Options</h2>
+                        <div class="share-grid">
+                            <div>
+                                <h3 class="config-label" style="margin-bottom: 1rem;">Social Platforms</h3>
+                                <div class="share-platforms">
+                                    <button class="social-btn" aria-label="Share on Twitter">?</button>
+                                    <button class="social-btn" aria-label="Share on Instagram">?</button>
+                                    <button class="social-btn" aria-label="Share on Telegram">??</button>
+                                    <button class="social-btn" aria-label="Share on Weibo">?</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="config-label" style="margin-bottom: 1rem;">Public Link</h3>
+                                <div class="public-link-box">
+                                    <input type="text" class="link-input" value="https://panelforge.com/share/abc123" readonly aria-label="Public share link">
+                                    <button class="btn-copy">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="recent-section" aria-labelledby="recent-title">
+                        <h2 id="recent-title" class="subsection-title">Recent Exports</h2>
+                        <div class="recent-grid">
+                            <article class="recent-item">
+                                <img data-src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Recent export 1" class="recent-thumb" loading="lazy">
+                                <div class="recent-info">
+                                    <span class="recent-time">17:08:35 ago</span>
+                                    <button class="recent-menu" aria-label="More options">?</button>
+                                </div>
+                            </article>
+                            <article class="recent-item">
+                                <img data-src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Recent export 2" class="recent-thumb" loading="lazy">
+                                <div class="recent-info">
+                                    <span class="recent-time">17:08:35 ago</span>
+                                    <button class="recent-menu" aria-label="More options">?</button>
+                                </div>
+                            </article>
+                            <article class="recent-item">
+                                <img data-src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Recent export 3" class="recent-thumb" loading="lazy">
+                                <div class="recent-info">
+                                    <span class="recent-time">15:06:33 ago</span>
+                                    <button class="recent-menu" aria-label="More options">?</button>
+                                </div>
+                            </article>
+                            <article class="recent-item">
+                                <img data-src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Recent export 4" class="recent-thumb" loading="lazy">
+                                <div class="recent-info">
+                                    <span class="recent-time">11:08:23 ago</span>
+                                    <button class="recent-menu" aria-label="More options">?</button>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="export-sidebar" aria-labelledby="sidebar-title">
+                    <h2 id="sidebar-title" class="sidebar-title">Comments & Notes</h2>
+                    <div class="notes-list">
+                        <div class="note-item">
+                            <div class="note-header">
+                                <div class="note-avatar"></div>
+                            </div>
+                            <div class="note-content">
+                                <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-bottom: 4px; width: 80%;"></div>
+                                <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-bottom: 4px; width: 100%;"></div>
+                                <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; width: 60%;"></div>
+                            </div>
+                        </div>
+                        <div class="note-item">
+                            <div class="note-header">
+                                <div class="note-avatar"></div>
+                            </div>
+                            <div class="note-content">
+                                <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-bottom: 4px; width: 70%;"></div>
+                                <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-bottom: 4px; width: 90%;"></div>
+                                <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <div id="pf-export-modal" class="progress-overlay" data-pf="export-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="progress-title">
+        <div class="progress-modal">
+            <h3 id="progress-title">Exporting PDF... 0%</h3>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 0%;"></div>
+            </div>
+            <p class="progress-text">Processing your comic export...</p>
+            <button class="close-progress">Cancel</button>
+        </div>
+    </div>
+
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PanelForge</h3>
+                <p>AI-powered comic creation platform for the next generation of storytellers.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="index.html#about">About</a>
+                <a href="index.html#contact">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#tutorials">Tutorials</a>
+                <a href="#documentation">Documentation</a>
+                <a href="#community">Community</a>
+                <a href="#support">Support</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: hello@panelforge.com</p>
+                <p>Support: support@panelforge.com</p>
+                <p>Follow us on social media</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 PanelForge. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            // Mobile menu toggle
+            const mobileToggle = document.querySelector('.pf-mobile-toggle');
+            const navMenu = document.querySelector('#pf-mobile-menu');
+            
+            if (mobileToggle && navMenu) {
+                mobileToggle.addEventListener('click', function() {
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', (!expanded).toString());
+                    navMenu.classList.toggle('active');
+                    navMenu.setAttribute('aria-hidden', (!navMenu.classList.contains('active')).toString());
+                });
+
+                // Close menu on Escape
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                        mobileToggle.setAttribute('aria-expanded', 'false');
+                        mobileToggle.focus();
+                        navMenu.setAttribute('aria-hidden', 'true');
+                    }
+                });
+            }
+
+            // Active menu highlighting (fallback based on pathname)
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                const href = link.getAttribute('href') || '';
+                const filename = href.split('/').pop();
+                if (filename && filename === currentPath.split('/').pop()) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                } else if (currentPath.includes('export') && link.getAttribute('data-nav-key') === 'export') {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                }
+            });
+
+            // Smooth scrolling for same-page anchors
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && href !== '#login' && !href.includes('http')) {
+                        const target = document.querySelector(href);
+                        if (target) {
+                            e.preventDefault();
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                            if (navMenu && navMenu.classList.contains('active')) {
+                                navMenu.classList.remove('active');
+                                if (mobileToggle) {
+                                    mobileToggle.setAttribute('aria-expanded', 'false');
+                                    navMenu.setAttribute('aria-hidden', 'true');
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Format card selection
+            const formatCards = document.querySelectorAll('.format-card');
+            formatCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    formatCards.forEach(c => {
+                        c.classList.remove('selected');
+                        c.setAttribute('aria-checked', 'false');
+                    });
+                    this.classList.add('selected');
+                    this.setAttribute('aria-checked', 'true');
+                });
+
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+
+            // Toggle switches
+            const toggleSwitches = document.querySelectorAll('.toggle-switch');
+            toggleSwitches.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const isActive = this.classList.contains('active');
+                    this.classList.toggle('active');
+                    this.setAttribute('aria-checked', (!isActive).toString());
+                });
+
+                toggle.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+
+            // Export button
+            const exportBtn = document.querySelector('.btn-export');
+            const progressOverlay = document.querySelector('#pf-export-modal');
+            const progressBar = progressOverlay ? progressOverlay.querySelector('.progress-bar') : null;
+            const progressTitle = progressOverlay ? progressOverlay.querySelector('h3') : null;
+            const closeProgress = progressOverlay ? progressOverlay.querySelector('.close-progress') : null;
+            const successToast = document.querySelector('.success-toast');
+
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function() {
+                    if (window.app && typeof window.app.showexportModal === 'function') {
+                        window.app.showexportModal();
+                        return;
+                    }
+                    // fallback behavior (shouldn't normally run if app API present)
+                    if (progressOverlay) {
+                        progressOverlay.classList.add('active');
+                        progressOverlay.setAttribute('aria-hidden', 'false');
+                        let progress = 0;
+                        
+                        const interval = setInterval(() => {
+                            progress += Math.random() * 15;
+                            if (progress >= 100) {
+                                progress = 100;
+                                clearInterval(interval);
+                                setTimeout(() => {
+                                    progressOverlay.classList.remove('active');
+                                    progressOverlay.setAttribute('aria-hidden', 'true');
+                                    if (successToast) {
+                                        successToast.style.display = 'flex';
+                                        setTimeout(() => {
+                                            successToast.style.display = 'none';
+                                        }, 5000);
+                                    }
+                                }, 500);
+                            }
+                            if (progressBar) progressBar.style.width = progress + '%';
+                            if (progressTitle) progressTitle.textContent = `Exporting PDF... ${Math.round(progress)}%`;
+                        }, 300);
+                    }
+                });
+            }
+
+            if (closeProgress) {
+                closeProgress.addEventListener('click', function() {
+                    if (window.app && typeof window.app.hideexportModal === 'function') {
+                        window.app.hideexportModal();
+                        return;
+                    }
+                    if (progressOverlay) {
+                        progressOverlay.classList.remove('active');
+                        progressOverlay.setAttribute('aria-hidden', 'true');
+                    }
+                });
+            }
+
+            // Close toast
+            const closeToast = successToast ? successToast.querySelector('.close') : null;
+            if (closeToast) {
+                closeToast.addEventListener('click', function() {
+                    successToast.style.display = 'none';
+                });
+            }
+
+            // Copy link button
+            const copyBtn = document.querySelector('.btn-copy');
+            const linkInput = document.querySelector('.link-input');
+            if (copyBtn && linkInput) {
+                copyBtn.addEventListener('click', function() {
+                    linkIn?[TRUNCATED]
