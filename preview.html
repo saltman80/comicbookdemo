@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PanelForge Preview - Review and preview your comic creation with full page navigation and regeneration options.">
+    <meta name="keywords" content="comic preview, comic page view, panel regeneration, comic review, comic editor">
+    <link rel="canonical" href="https://panelforge.com/preview">
+    <title>Preview - PanelForge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0A0E27;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://im.runware.ai/image/ws/2/ii/7db296f5-4a26-4633-8e11-2e115940331d.jpg') center center / cover no-repeat fixed;
+            opacity: 0.3;
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(107, 46, 159, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(217, 70, 239, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-curve {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .curve-1 {
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.4) 0%, transparent 70%);
+            filter: blur(40px);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .curve-2 {
+            bottom: -10%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(ellipse at center, rgba(217, 70, 239, 0.35) 0%, transparent 70%);
+            filter: blur(35px);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        .curve-3 {
+            top: 40%;
+            left: 10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(107, 46, 159, 0.3) 0%, transparent 70%);
+            filter: blur(30px);
+            border-radius: 50%;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #06B6D4;
+            color: #0A0E27;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            font-weight: 600;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .header-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #06B6D4;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #6B2E9F, #D946EF);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .btn-regenerate-top {
+            padding: 0.625rem 1.5rem;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .btn-regenerate-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            padding: 2rem 0;
+            min-height: calc(100vh - 100px);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .preview-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .preview-main {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.85) 0%, rgba(27, 40, 71, 0.7) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.03) 0%, rgba(107, 46, 159, 0.03) 100%);
+            pointer-events: none;
+        }
+
+        .preview-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 6px;
+            color: #06B6D4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            border-color: #06B6D4;
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-regenerate-page {
+            padding: 0.5rem 1.25rem;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid #06B6D4;
+            border-radius: 6px;
+            color: #06B6D4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-regenerate-page:hover {
+            background: rgba(6, 182, 212, 0.2);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-download {
+            width: 36px;
+            height: 36px;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 6px;
+            color: #06B6D4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-download:hover {
+            border-color: #06B6D4;
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .page-canvas {
+            background: #E5E7EB;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .page-canvas::after {
+            content: 'PREVIEW WATERMARK';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #6B7280;
+            padding: 0.375rem 0.875rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .comic-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 1rem;
+        }
+
+        .comic-panel {
+            position: relative;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .comic-panel.wide {
+            grid-column: span 2;
+        }
+
+        .comic-panel.tall {
+            grid-row: span 2;
+        }
+
+        .comic-panel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .panel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .comic-panel:hover .panel-overlay {
+            opacity: 1;
+        }
+
+        .btn-regenerate-panel {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-regenerate-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(6, 182, 212, 0.6);
+        }
+
+        .page-navigation {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-btn {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 0.75rem;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .page-btn:hover {
+            border-color: #06B6D4;
+            color: #06B6D4;
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            border-color: #06B6D4;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .page-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 3px;
+            appearance: none;
+            outline: none;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+
+        .page-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+
+        .page-slider::-webkit-slider-runnable-track {
+            height: 6px;
+            background: linear-gradient(to right, #06B6D4 0%, #06B6D4 10%, rgba(6, 182, 212, 0.2) 10%);
+            border-radius: 3px;
+        }
+
+        .thumbnail-strip {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .thumbnail-strip::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .thumbnail-strip::-webkit-scrollbar-track {
+            background: rgba(10, 14, 39, 0.6);
+            border-radius: 3px;
+        }
+
+        .thumbnail-strip::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.4);
+            border-radius: 3px;
+        }
+
+        .thumbnail-strip::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.6);
+        }
+
+        .thumbnail {
+            min-width: 80px;
+            width: 80px;
+            aspect-ratio: 2/3;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .thumbnail.active {
+            border-color: #06B6D4;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+        }
+
+        .thumbnail:hover {
+            transform: translateY(-3px);
+            border-color: #06B6D4;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview-sidebar {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.5) 0%, rgba(10, 14, 39, 0.7) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .note-item {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(107, 46, 159, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .note-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .note-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(107, 46, 159, 0.4), rgba(217, 70, 239, 0.4));
+        }
+
+        .note-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .note-line {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .note-line.short {
+            width: 60%;
+        }
+
+        .note-line.medium {
+            width: 80%;
+        }
+
+        .note-line.long {
+            width: 100%;
+        }
+
+        @media (max-width: 1200px) {
+            .preview-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 1rem;
+            }
+
+            .preview-main {
+                padding: 1rem;
+            }
+
+            .comic-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+                padding: 0.75rem;
+            }
+
+            .page-navigation {
+                flex-wrap: wrap;
+            }
+
+            .thumbnail-strip {
+                gap: 0.75rem;
+            }
+
+            .thumbnail {
+                min-width: 60px;
+                width: 60px;
+            }
+
+            .preview-controls {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .page-actions {
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .comic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comic-panel.wide,
+            .comic-panel.tall {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <div class="glow-curve curve-1"></div>
+    <div class="glow-curve curve-2"></div>
+    <div class="glow-curve curve-3"></div>
+
+    <header role="banner" class="pf-header" data-pf="header">
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PanelForge Home">
+                <div class="logo-icon">?</div>
+                <span>PanelForge</span>
+            </a>
+
+            <nav class="pf-nav" data-pf="nav" aria-label="Primary">
+                <a class="pf-nav-link" data-pf="nav-link" data-nav-key="home" href="index.html">Home</a>
+                <a class="pf-nav-link" data-pf="nav-link" data-nav-key="create" href="create.html">Create</a>
+                <a class="pf-nav-link" data-pf="nav-link" data-nav-key="studio" href="studio.html">Studio</a>
+                <a class="pf-nav-link" data-pf="nav-link" data-nav-key="storyboard" href="storyboard.html">Storyboard</a>
+                <a class="pf-nav-link" data-pf="nav-link" data-nav-key="preview" href="preview.html">Preview</a>
+                <a class="pf-nav-link" data-pf="nav-link" data-nav-key="export" href="export.html">Export</a>
+            </nav>
+
+            <div style="display:flex; gap:0.75rem; align-items:center;">
+                <a href="create.html" class="pf-login" data-pf="login" style="text-decoration:none; color:#06B6D4; font-weight:600;">Log in</a>
+                <button class="btn-regenerate-top">Regenerate</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main" class="pf-main" data-pf="main" role="main">
+        <div class="container">
+            <div class="preview-layout">
+                <div class="preview-main" data-pf="preview">
+                    <div class="preview-controls">
+                        <div class="zoom-controls">
+                            <button class="zoom-btn" aria-label="Fit to screen">?</button>
+                            <button class="zoom-btn" aria-label="Zoom out">?</button>
+                            <button class="zoom-btn" aria-label="Zoom in">+</button>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn-regenerate-page">
+                                <span>?</span>
+                                Regenerate Page
+                            </button>
+                            <button class="btn-download" aria-label="Download page">?</button>
+                        </div>
+                    </div>
+
+                    <div class="page-canvas">
+                        <div class="comic-grid" data-pf="grid">
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-1">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 1">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-2">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 2">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-3">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 3">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel wide pf-card" data-pf="card" data-card-id="panel-4">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 4">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-5">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 5">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-6">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 6">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-7">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 7">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-8">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 8">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-9">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 9">
+                                <div class="panel-overlay">
+                                    <button class="btn-regenerate-panel">
+                                        <span>?</span>
+                                        Regenerate
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="page-navigation" aria-label="Page navigation">
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                        <button class="page-btn">6</button>
+                        <button class="page-btn">7</button>
+                        <button class="page-btn">8</button>
+                        <button class="page-btn">9</button>
+                        <button class="page-btn">10</button>
+                    </nav>
+
+                    <input type="range" class="page-slider" min="1" max="10" value="1" aria-label="Page slider">
+
+                    <div class="thumbnail-strip" data-pf="thumbnail-strip">
+                        <div class="thumbnail active">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 1 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 2 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 3 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 4 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 5 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 6 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 7 thumbnail">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 8 thumbnail">
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="preview-sidebar" aria-labelledby="sidebar-title">
+                    <h2 id="sidebar-title" class="sidebar-title">Comments & Notes</h2>
+                    <div class="notes-list">
+                        <div class="note-item">
+                            <div class="note-header">
+                                <div class="note-avatar"></div>
+                            </div>
+                            <div class="note-content">
+                                <div class="note-line medium"></div>
+                                <div class="note-line long"></div>
+                                <div class="note-line long"></div>
+                                <div class="note-line short"></div>
+                            </div>
+                        </div>
+                        <div class="note-item">
+                            <div class="note-header">
+                                <div class="note-avatar"></div>
+                            </div>
+                            <div class="note-content">
+                                <div class="note-line short"></div>
+                                <div class="note-line long"></div>
+                                <div class="note-line medium"></div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script>
+        (function () {
+            'use strict';
+
+            // Provide a minimal app API on window.app ? idempotent
+            var app = window.app || {};
+            if (!app._provided) {
+
+                app._provided = true;
+                app._inited = false;
+
+                app.highlightActiveNav = function (key) {
+                    var links = document.querySelectorAll('a.pf-nav-link[data-pf="nav-link"]');
+                    if (!links || links.length === 0) {
+                        console.warn('app.highlightActiveNav: no nav links found');
+                    }
+                    links.forEach(function (link) {
+                        var k = link.getAttribute('data-nav-key');
+                        var active = (k === key);
+                        link.classList.toggle('is-active', active);
+                        if (active) {
+                            link.setAttribute('aria-current', 'true');
+                        } else {
+                            link.removeAttribute('aria-current');
+                        }
+                    });
+                    // Emit event
+                    document.dispatchEvent(new CustomEvent('pf:nav:activated', { detail: { key: key } }));
+                };
+
+                app.toggleMobileMenu = function () {
+                    var menu = document.querySelector('.pf-mobile-menu');
+                    if (!menu) {
+                        console.warn('app.toggleMobileMenu: .pf-mobile-menu not found');
+                        return;
+                    }
+                    var open = menu.classList.toggle('is-open');
+                    menu.setAttribute('aria-hidden', String(!open));
+                    menu.setAttribute('aria-expanded', String(open));
+                };
+
+                app.activateCard = function (cardId) {
+                    var cards = document.querySelectorAll('.pf-card[data-pf="card"]');
+                    if (!cards || cards.length === 0) {
+                        console.warn('app.activateCard: no pf-card elements found');
+                        return;
+                    }
+                    var target = null;
+                    cards.forEach(function (c) {
+                        var id = c.getAttribute('data-card-id');
+                        var isActive = (id === cardId);
+                        c.classList.toggle('is-active', isActive);
+                        if (isActive) {
+                            c.setAttribute('aria-pressed', 'true');
+                            target = c;
+                        } else {
+                            c.removeAttribute('aria-pressed');
+                        }
+                    });
+                    document.dispatchEvent(new CustomEvent('pf:card:activated', { detail: { cardId: cardId, card: target } }));
+                };
+
+                app.showexportModal = function () {
+                    document.dispatchEvent(new CustomEvent('pf:export:start'));
+                    // simple simulation of progress/complete
+                    setTimeout(function () {
+                        document.dispatchEvent(new CustomEvent('pf:export:progress', { detail: { progress: 50 } }));
+                        setTimeout(function () {
+                            document.dispatchEvent(new CustomEvent('pf:export:complete'));
+                        }, 500);
+                    }, 300);
+                };
+
+                app.hideexportModal = function () {
+                    document.dispatchEvent(new CustomEvent('pf:export:closed'));
+                };
+
+                app.init = function (rootDocument) {
+                    if (app._inited) return;
+                    app._inited = true;
+                    var root = rootDocument || document;
+
+                    // Basic selector checks
+                    var main = root.querySelector('[data-pf="main"]');
+                    if (!main) console.warn('app.init: main [data-pf="main"] not found');
+
+                    var navLinks = root.querySelectorAll('a.pf-nav-link[data-pf="nav-link"]');
+                    if (!navLinks || navLinks.length === 0) {
+                        console.warn('app.init: nav links missing (a.pf-nav-link[data-pf="nav-link"])');
+                    } else {
+                        // wire click handlers
+                        navLinks.forEach(function (link) {
+                            link.addEventListener('click', function (e) {
+                                var key = link.getAttribute('data-nav-key');
+                                app.highlightActiveNav(key);
+                            });
+                        });
+                        // determine active by pathname fallback to preview
+                        var path = (location.pathname || '').split('/').pop() || 'index.html';
+                        var pageKey = 'preview';
+                        navLinks.forEach(function (link) {
+                            var href = link.getAttribute('href') || '';
+                            if (href && href.indexOf(path) !== -1) {
+                                pageKey = link.getAttribute('data-nav-key') || pageKey;
+                            }
+                        });
+                        app.highlightActiveNav(pageKey);
+                    }
+
+                    // Page navigation (buttons, slider, thumbnails)
+                    var pageButtons = root.querySelectorAll('.page-btn');
+                    var pageSlider = root.querySelector('.page-slider');
+                    var thumbnails = root.querySelectorAll('.thumbnail');
+
+                    function setActivePage(pageNum) {
+                        pageButtons.forEach(function (btn, index) {
+                            btn.classList.toggle('active', index + 1 === pageNum);
+                        });
+                        thumbnails.forEach(function (thumb, index) {
+                            thumb.classList.toggle('active', index + 1 === pageNum);
+                        });
+                        if (pageSlider) {
+                            pageSlider.value = pageNum;
+                        }
+                    }
+
+                    pageButtons.forEach(function (btn, index) {
+                        btn.addEventListener('click', function () {
+                            setActivePage(index + 1);
+                        });
+                    });
+
+                    if (pageSlider) {
+                        pageSlider.addEventListener('input', function () {
+                            setActivePage(parseInt(this.value, 10));
+                        });
+                    }
+
+                    thumbnails.forEach(function (thumb, index) {
+                        thumb.addEventListener('click', function () {
+                            setActivePage(index + 1);
+                            try {
+                                this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                            } catch (err) { /* ignore if not supported */ }
+                        });
+                    });
+
+                    // Regenerate buttons
+                    var regenerateTopBtn = root.querySelector('.btn-regenerate-top');
+                    var regeneratePageBtn = root.querySelector('.btn-regenerate-page');
+                    var regeneratePanelBtns = root.querySelectorAll('.btn-regenerate-panel');
+
+                    function showRegenerateMessage(target) {
+                        alert('Regenerating ' + target + '...');
+                    }
+
+                    if (regenerateTopBtn) {
+                        regenerateTopBtn.addEventListener('click', function () { showRegenerateMessage('page'); });
+                    }
+
+                    if (regeneratePageBtn) {
+                        regeneratePageBtn.addEventListener('click', function () { showRegenerateMessage('page'); });
+                    }
+
+                    regeneratePanelBtns.forEach(function (btn, index) {
+                        btn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            showRegenerateMessage('panel ' + (index + 1));
+                        });
+                    });
+
+                    // Zoom controls
+                    var zoomBtns = root.querySelectorAll('.zoom-btn');
+                    var zoomLevel = 1;
+
+                    zoomBtns.forEach(function (btn, index) {
+                        btn.addEventListener('click', function () {
+                            if (index === 0) {
+                                zoomLevel = 1; // Fit to screen
+                            } else if (index === 1) {
+                                zoomLevel = Math.max(0.5, zoomLevel - 0.1); // Zoom out
+                            } else if (index === 2) {
+                                zoomLevel = Math.min(2, zoomLevel + 0.1); // Zoom in
+                            }
+                            var canvas = root.querySelector('.page-canvas');
+                            if (canvas) {
+                                canvas.style.transform = 'scale(' + zoomLevel + ')';
+                                canvas.style.transformOrigin = 'top center';
+                            }
+                        });
+                    });
+
+                    // Download button
+                    var downloadBtn = root.querySelector('.btn-download');
+                    if (downloadBtn) {
+                        downloadBtn.addEventListener('click', function () {
+                            alert('Downloading current page...');
+                        });
+                    }
+
+                    // Keyboard navigation
+                    document.addEventListener('keydown', function (e) {
+                        var currentPage = parseInt(pageSlider ? pageSlider.value : 1, 10) || 1;
+                        if (e.key === 'ArrowLeft' && currentPage > 1) {
+                            setActivePage(currentPage - 1);
+                        } else if (e.key === 'ArrowRight' && currentPage < pageButtons.length) {
+                            setActivePage(currentPage + 1);
+                        }
+                    });
+
+                    // Card activation wiring
+                    var cards = root.querySelectorAll('.pf-card[data-pf="card"]');
+                    if (!cards || cards.length === 0) {
+                        console.warn('app.init: no pf-card elements found');
+                    } else {
+                        cards.forEach(function (card) {
+                            card.addEventListener('click', function (e) {
+                                var id = card.getAttribute('data-card-id');
+                                if (id) app.activateCard(id);
+                            });
+                        });
+                    }
+
+                    // thumbnail-strip presence check
+                    var thumbStrip = root.querySelector('[data-pf="thumbnail-strip"]');
+                    if (!thumbStrip) {
+                        console.warn('app.init: thumbnail strip [data-pf="thumbnail-strip"] not found');
+                    }
+                };
+            }
+
+            window.app = app;
+
+            // Call init after DOM content loaded
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.app && typeof window.app.init === 'function') {
+                    window.app.init(document);
+                } else {
+                    console.warn('app.init is not available');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
