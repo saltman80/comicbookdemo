@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PanelForge Studio - Create and customize your comic characters with style presets and detailed controls.">
+    <meta name="keywords" content="studio, character creator, style selector, comic characters, PanelForge">
+    <link rel="canonical" href="https://panelforge.com/studio">
+    <title>Studio - PanelForge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset & base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html,body { height: 100%; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0A0E27;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background art & glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://im.runware.ai/image/ws/2/ii/7db296f5-4a26-4633-8e11-2e115940331d.jpg') center center / cover no-repeat fixed;
+            opacity: 0.3;
+            z-index: -2;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(107,46,159,0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(217,70,239,0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(6,182,212,0.15) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-curve { position: fixed; pointer-events: none; z-index: 0; border-radius: 50%; filter: blur(30px); }
+        .curve-1 { top: -8%; right: -6%; width: 620px; height: 620px; background: radial-gradient(ellipse at center, rgba(6,182,212,0.35) 0%, transparent 70%); animation: float 8s ease-in-out infinite; }
+        .curve-2 { bottom: -12%; left: -6%; width: 520px; height: 520px; background: radial-gradient(ellipse at center, rgba(217,70,239,0.33) 0%, transparent 70%); animation: float 10s ease-in-out infinite reverse;}
+        .curve-3 { top: 36%; left: 8%; width: 420px; height: 420px; background: radial-gradient(ellipse at center, rgba(107,46,159,0.28) 0%, transparent 70%); animation: float 12s ease-in-out infinite;}
+
+        @keyframes float { 0%,100%{ transform: translate(0,0) scale(1);} 50%{ transform: translate(30px,-30px) scale(1.06);} }
+
+        /* Skip link */
+        .skip-link {
+            position: absolute; top: -40px; left: 0; background: #06B6D4; color: #0A0E27; padding: 8px 16px;
+            text-decoration: none; border-radius: 0 0 4px 0; font-weight: 600; z-index: 100;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* Header with site-wide navigation */
+        header {
+            position: sticky; top: 0; z-index: 60;
+            background: rgba(10,14,39,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(6,182,212,0.15);
+        }
+        .header-container {
+            max-width: 1600px; margin: 0 auto; padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+        }
+        .logo {
+            font-size: 1.35rem; font-weight: 700; color: #06B6D4; text-decoration: none;
+            letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .logo-icon {
+            width: 36px; height: 36px; background: linear-gradient(135deg,#6B2E9F,#D946EF);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        /* Site nav */
+        .site-nav {
+            display: flex; gap: 14px; align-items: center; margin-left: 1rem;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85); text-decoration: none; padding: 8px 12px; border-radius: 8px;
+            font-weight: 500; font-size: 0.95rem; transition: all 0.18s ease;
+        }
+        .nav-link:hover { background: rgba(6,182,212,0.06); color: #06B6D4; transform: translateY(-2px); }
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(107,46,159,0.06));
+            color: #06B6D4; border: 1px solid rgba(6,182,212,0.18); box-shadow: 0 6px 20px rgba(6,182,212,0.06);
+        }
+
+        .header-actions { margin-left: auto; display: flex; gap: 0.75rem; align-items:center; }
+
+        .btn-header {
+            padding: 0.5rem 1rem; background: linear-gradient(135deg,#06B6D4,#0891B2);
+            color: #0A0E27; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;
+            transition: all 0.25s ease; box-shadow: 0 6px 22px rgba(6,182,212,0.18);
+            font-size: 0.9rem;
+        }
+        .btn-header:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(6,182,212,0.28); }
+
+        main { position: relative; z-index: 1; padding: 2rem 0; min-height: calc(100vh - 100px); }
+
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 2rem; }
+
+        /* Studio layout: character grid left, controls panel right */
+        .studio-layout { 
+            display: grid; 
+            grid-template-columns: 1fr 380px; 
+            gap: 2rem; 
+            margin-top: 1rem; 
+        }
+
+        /* Left column: character grid */
+        .character-grid-section {
+            background: linear-gradient(135deg, rgba(10,14,39,0.86) 0%, rgba(27,40,71,0.7) 100%);
+            border: 2px solid; border-image: linear-gradient(135deg,#06B6D4,#6B2E9F) 1;
+            border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(6,182,212,0.12); position: relative; overflow: hidden;
+        }
+
+        .character-grid-section::before {
+            content: ''; position: absolute; inset:0; background: linear-gradient(135deg, rgba(6,182,212,0.02), rgba(107,46,159,0.02)); pointer-events:none;
+        }
+
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; position: relative; z-index: 1;
+        }
+
+        .section-title { font-size: 1.1rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Character grid: repeatable tiles */
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .character-card {
+            background: linear-gradient(135deg, rgba(27,40,71,0.6), rgba(10,14,39,0.8));
+            border: 2px solid rgba(6,182,212,0.18);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .character-card:hover {
+            transform: translateY(-6px);
+            border-color: #06B6D4;
+            box-shadow: 0 12px 36px rgba(6,182,212,0.22);
+        }
+
+        .character-card.selected {
+            border-color: #06B6D4;
+            box-shadow: 0 0 0 3px rgba(6,182,212,0.2), 0 12px 36px rgba(6,182,212,0.3);
+        }
+
+        .character-card-image {
+            width: 100%;
+            aspect-ratio: 4/5;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(107,46,159,0.08));
+        }
+
+        .character-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .character-card-stats {
+            padding: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: rgba(10,14,39,0.7);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            min-width: 42px;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+        }
+
+        /* Right column: inspector/controls panel */
+        .inspector-panel {
+            background: linear-gradient(135deg, rgba(27,40,71,0.5), rgba(10,14,39,0.7));
+            border: 1px solid rgba(6,182,212,0.12);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .inspector-panel::-webkit-scrollbar { width: 8px; }
+        .inspector-panel::-webkit-scrollbar-track { background: rgba(10,14,39,0.6); border-radius: 4px; }
+        .inspector-panel::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.36); border-radius: 4px; }
+
+        .control-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .control-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        /* Style selector pills */
+        .style-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .style-pill {
+            padding: 0.85rem 1.25rem;
+            background: rgba(10,14,39,0.6);
+            border: 2px solid rgba(6,182,212,0.25);
+            border-radius: 50px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .style-pill:hover {
+            border-color: #06B6D4;
+            background: rgba(6,182,212,0.08);
+            transform: translateX(4px);
+        }
+
+        .style-pill.active {
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            border-color: #06B6D4;
+            box-shadow: 0 8px 24px rgba(6,182,212,0.3);
+        }
+
+        /* Prompt input */
+        .prompt-input,
+        .negative-prompt-input {
+            width: 100%;
+            background: rgba(10,14,39,0.7);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 10px;
+            padding: 0.85rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.25s ease;
+        }
+
+        .prompt-input:focus,
+        .negative-prompt-input:focus {
+            outline: none;
+            border-color: #06B6D4;
+            box-shadow: 0 0 0 3px rgba(6,182,212,0.15);
+        }
+
+        .prompt-input::placeholder,
+        .negative-prompt-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Sliders */
+        .slider-control {
+            width: 100%;
+        }
+
+        .slider-input {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, rgba(6,182,212,0.3) 0%, rgba(107,46,159,0.3) 100%);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(6,182,212,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .slider-input::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 18px rgba(6,182,212,0.6);
+        }
+
+        .slider-input::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(6,182,212,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .slider-input::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 18px rgba(6,182,212,0.6);
+        }
+
+        /* Upload reference images */
+        .upload-area {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .upload-slot {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(6,182,212,0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(10,14,39,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-slot:hover {
+            border-color: #06B6D4;
+            background: rgba(6,182,212,0.05);
+        }
+
+        .upload-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .upload-slot.empty::before {
+            content: '?';
+            font-size: 1.75rem;
+            opacity: 0.5;
+        }
+
+        /* Preview panel */
+        .preview-panel {
+            background: linear-gradient(135deg, rgba(10,14,39,0.7), rgba(27,40,71,0.6));
+            border: 2px solid rgba(6,182,212,0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .preview-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-image-container {
+            width: 100%;
+            aspect-ratio: 4/5;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+        }
+
+        .preview-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .studio-layout { grid-template-columns: 1fr; }
+            .inspector-panel { position: static; max-height: none; }
+            .character-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            .header-container { padding: 0.75rem 1rem; flex-wrap: wrap; }
+            .site-nav { gap: 8px; width: 100%; order: 3; justify-content: center; }
+            .nav-link { padding: 6px 10px; font-size: 0.85rem; }
+            .character-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
+            .container { padding: 0 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .character-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <div class="glow-curve curve-1"></div>
+    <div class="glow-curve curve-2"></div>
+    <div class="glow-curve curve-3"></div>
+
+    <header data-pf="header" role="banner" aria-label="Site header">
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PanelForge Home">
+                <div class="logo-icon">?</div>
+                <span>PanelForge</span>
+            </a>
+
+            <nav class="site-nav pf-nav" data-pf="nav" role="navigation" aria-label="Main navigation">
+                <a class="nav-link" data-pf="nav-link" data-nav-key="home" href="index.html">Home</a>
+                <a class="nav-link" data-pf="nav-link" data-nav-key="create" href="create.html">Create</a>
+                <a class="nav-link active" data-pf="nav-link" data-nav-key="studio" href="studio.html" aria-current="page">Studio</a>
+                <a class="nav-link" data-pf="nav-link" data-nav-key="storyboard" href="storyboard.html">Storyboard</a>
+                <a class="nav-link" data-pf="nav-link" data-nav-key="preview" href="preview.html">Preview</a>
+                <a class="nav-link" data-pf="nav-link" data-nav-key="export" href="export.html">Export</a>
+                <a class="nav-link pf-login" data-pf="nav-link" data-pf-login data-pf="login" data-pf-login2 href="create.html" data-pf="login">Login</a>
+            </nav>
+
+            <button class="pf-mobile-toggle" data-pf="mobile-toggle" aria-controls="pf-mobile-menu" aria-expanded="false" aria-label="Toggle mobile menu"></button>
+
+            <div class="header-actions" role="group" aria-label="Header actions">
+                <button class="btn-header" title="Generate character">Generate</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main" data-pf="main" class="pf-main" role="main">
+        <div class="container">
+            <div class="studio-layout">
+                <!-- Left: Character Grid -->
+                <section class="character-grid-section" aria-labelledby="character-grid-heading">
+                    <div class="section-header">
+                        <h1 id="character-grid-heading" class="section-title">Character Studio</h1>
+                    </div>
+
+                    <div class="character-grid" role="list" aria-label="Character selection grid">
+                        <!-- Male character cards -->
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="male-1" data-card-id="male-1" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Male character 1">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Female character cards -->
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="female-1" data-card-id="female-1" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Female character 1">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="male-2" data-card-id="male-2" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Male character 2">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>78</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="female-2" data-card-id="female-2" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Female character 2">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="male-3" data-card-id="male-3" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Male character 3">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="female-3" data-card-id="female-3" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Female character 3">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="female-4" data-card-id="female-4" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Female character 4">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>90</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="male-4" data-card-id="male-4" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Male character 4">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>75</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>85</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="female-5" data-card-id="female-5" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Female character 5">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>70</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="male-5" data-card-id="male-5" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Male character 5">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>75</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>85</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="male-6" data-card-id="male-6" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Male character 6">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>78</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>85</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="character-card pf-card" role="listitem" tabindex="0" data-character="female-6" data-card-id="female-6" data-pf="card">
+                            <div class="character-card-image">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Female character 6">
+                            </div>
+                            <div class="character-card-stats">
+                                <div class="stat-badge">
+                                    <span class="stat-label">STR</span>
+                                    <span>85</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">DEX</span>
+                                    <span>80</span>
+                                </div>
+                                <div class="stat-badge">
+                                    <span class="stat-label">INT</span>
+                                    <span>75</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right: Inspector/Controls Panel -->
+                <aside class="inspector-panel" aria-labelledby="inspector-heading">
+                    <!-- Style selector -->
+                    <div class="control-group">
+                        <label class="control-label" id="style-label">Style</label>
+                        <div class="style-pills" role="radiogroup" aria-labelledby="style-label">
+                            <div class="style-pill active" role="radio" aria-checked="true" tabindex="0" data-style="manga">Manga</div>
+                            <div class="style-pill" role="radio" aria-checked="false" tabindex="0" data-style="noir">Noir</div>
+                            <div class="style-pill" role="radio" aria-checked="false" tabindex="0" data-style="scifi">Sci-Fi</div>
+                        </div>
+                    </div>
+
+                    <!-- Prompt input -->
+                    <div class="control-group">
+                        <label class="control-label" for="prompt-input">Prompt</label>
+                        <textarea 
+                            id="prompt-input" 
+                            class="prompt-input" 
+                            placeholder="A cybernetic warrior with glowing blue armor in a neon city. A cybernetic warrior glowing blue armor in a neon city..."
+                            aria-label="Character prompt">A cybernetic warrior with glowing blue armor in a neon city. A cybernetic warrior glowing blue armor in a neon city...</textarea>
+                    </div>
+
+                    <!-- Negative prompt -->
+                    <div class="control-group">
+                        <label class="control-label" for="negative-prompt-input">Negative prompt</label>
+                        <textarea 
+                            id="negative-prompt-input" 
+                            class="negative-prompt-input" 
+                            placeholder="Negative prompt for everyone..."
+                            aria-label="Negative prompt"></textarea>
+                    </div>
+
+                    <!-- Line Weight slider -->
+                    <div class="control-group">
+                        <label class="control-label" for="line-weight-slider">Line Weight</label>
+                        <input 
+                            type="range" 
+                            id="line-weight-slider" 
+                            class="slider-input slider-control" 
+                            min="0" 
+                            max="100" 
+                            value="50"
+                            aria-label="Line weight control">
+                    </div>
+
+                    <!-- Contrast slider -->
+                    <div class="control-group">
+                        <label class="control-label" for="contrast-slider">Contrast</label>
+                        <input 
+                            type="range" 
+                            id="contrast-slider" 
+                            class="slider-input slider-control" 
+                            min="0" 
+                            max="100" 
+                            value="50"
+                            aria-label="Contrast control">
+                    </div>
+
+                    <!-- Neon Accent Intensity slider -->
+                    <div class="control-group">
+                        <label class="control-label" for="neon-slider">Neon Accent Intensity</label>
+                        <input 
+                            type="range" 
+                            id="neon-slider" 
+                            class="slider-input slider-control" 
+                            min="0" 
+                            max="100" 
+                            value="70"
+                            aria-label="Neon accent intensity control">
+                    </div>
+
+                    <!-- Upload reference images -->
+                    <div class="control-group">
+                        <label class="control-label">Upload for reference images</label>
+                        <div class="upload-area" role="group" aria-label="Reference image uploads">
+                            <div class="upload-slot empty" tabindex="0" role="button" aria-label="Upload reference image 1"></div>
+                            <div class="upload-slot" tabindex="0" role="button" aria-label="Reference image 2">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Reference image 2">
+                            </div>
+                            <div class="upload-slot" tabindex="0" role="button" aria-label="Reference image 3">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Reference image 3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview panel -->
+                    <div class="control-group">
+                        <div class="preview-panel" data-pf="preview">
+                            <div class="preview-header">
+                                <span class="preview-title">Preview</span>
+                                <span class="status-badge">Completed</span>
+                            </div>
+                            <div class="preview-image-container">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Character preview">
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Minimal public app API attached to window.app
+            window.app = (function () {
+                var doc = document;
+
+                // Helper: dispatch contract events
+                function emit(eventName, detail) {
+                    try {
+                        var ev = new CustomEvent(eventName, { detail: detail });
+                        doc.dispatchEvent(ev);
+                    } catch (e) {
+                        // older browsers fallback
+                        var ev2 = document.createEvent('CustomEvent');
+                        ev2.initCustomEvent(eventName, true, true, detail);
+                        doc.dispatchEvent(ev2);
+                    }
+                }
+
+                // Highlight nav link by data-nav-key, manage aria-current and .is-active
+                function highlightActiveNav(pathKey) {
+                    var navLinks = doc.querySelectorAll('[data-pf="nav"] [data-pf="nav-link"]');
+                    navLinks.forEach(function (lnk) {
+                        var key = lnk.getAttribute('data-nav-key');
+                        if (key === pathKey) {
+                            lnk.setAttribute('aria-current', 'page');
+                            lnk.classList.add('is-active');
+                        } else {
+                            // remove only contract state, preserve visual .active class if present
+                            if (lnk.hasAttribute('aria-current')) {
+                                lnk.removeAttribute('aria-current');
+                            }
+                            lnk.classList.remove('is-active');
+                        }
+                    });
+                    emit('pf:nav:activated', { key: pathKey });
+                }
+
+                // Toggle mobile menu placeholder
+                function toggleMobileMenu() {
+                    var btn = doc.querySelector('[data-pf="mobile-toggle"]');
+                    if (!btn) return;
+                    var expanded = btn.getAttribute('aria-expanded') === 'true';
+                    btn.setAttribute('aria-expanded', (!expanded).toString());
+                    // Toggle a visible state on body for consumers
+                    document.body.classList.toggle('is-open', !expanded);
+                }
+
+                // Activate a card by cardId (data-card-id)
+                function activateCard(cardId) {
+                    if (!cardId) return;
+                    var cards = doc.querySelectorAll('[data-pf="card"]');
+                    var target = null;
+                    cards.forEach(function (c) {
+                        var id = c.getAttribute('data-card-id');
+                        if (id === cardId) {
+                            target = c;
+                        }
+                    });
+                    if (!target) return;
+
+                    cards.forEach(function (c) {
+                        c.classList.remove('selected');
+                        c.classList.remove('is-active');
+                        c.setAttribute('aria-selected', 'false');
+                        c.setAttribute('aria-pressed', 'false');
+                    });
+
+                    target.classList.add('selected'); // preserve existing visual class
+                    target.classList.add('is-active'); // contract state class
+                    target.setAttribute('aria-selected', 'true');
+                    target.setAttribute('aria-pressed', 'true');
+
+                    emit('pf:card:activated', { cardId: cardId });
+                }
+
+                // Show export modal placeholder
+                function showexportModal() {
+                    document.body.classList.add('is-exporting');
+                }
+
+                function hideexportModal() {
+                    document.body.classList.remove('is-exporting');
+                }
+
+                // Initialization: bind events and set initial states
+                function init(rootDocument) {
+                    doc = rootDocument || document;
+
+                    // Nav link clicks
+                    var navLinks = doc.querySelectorAll('[data-pf="nav"] [data-pf="nav-link"]');
+                    navLinks.forEach(function (lnk) {
+                        lnk.addEventListener('click', function (e) {
+                            var key = lnk.getAttribute('data-nav-key');
+                            if (key) {
+                                highlightActiveNav(key);
+                            }
+                        });
+                    });
+
+                    // Map current location to nav key and highlight
+                    try {
+                        var filename = (doc.location && doc.location.pathname) ? doc.location.pathname.split('/').pop() : '';
+                        if (!filename) filename = 'index.html';
+                        var matchedKey = null;
+                        navLinks.forEach(function (lnk) {
+                            try {
+                                var href = lnk.getAttribute('href') || '';
+                                var linkFile = href.split('/').pop();
+                                if (linkFile === filename) {
+                                    var k = lnk.getAttribute('data-nav-key');
+                                    if (k) matchedKey = k;
+                                }
+                            } catch (e) { /* ignore */ }
+                        });
+                        if (matchedKey) {
+                            highlightActiveNav(matchedKey);
+                        }
+                    } catch (e) { /* ignore */ }
+
+                    // Character cards: bind click/keyboard
+                    var characterCards = doc.querySelectorAll('[data-pf="card"]');
+                    characterCards.forEach(function (card) {
+                        // ensure tabindex and role remain as-is
+                        card.addEventListener('click', function () {
+                            var id = card.getAttribute('data-card-id') || card.getAttribute('data-character');
+                            activateCard(id);
+                        });
+                        card.addEventListener('keydown', function (e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                var id = card.getAttribute('data-card-id') || card.getAttribute('data-character');
+                                activateCard(id);
+                            }
+                        });
+                    });
+
+                    // Initialize first character as selected (preserve previous behavior)
+                    if (characterCards.length > 0) {
+                        var firstId = characterCards[0].getAttribute('data-card-id') || characterCards[0].getAttribute('data-character');
+                        activateCard(firstId);
+                    }
+
+                    // Style pill selection (unchanged behavior)
+                    var stylePills = doc.querySelectorAll('.style-pill');
+                    function selectStyle(pill) {
+                        stylePills.forEach(function (p) {
+                            p.classList.remove('active');
+                            p.setAttribute('aria-checked', 'false');
+                        });
+                        pill.classList.add('active');
+                        pill.setAttribute('aria-checked', 'true');
+                    }
+                    stylePills.forEach(function (pill) {
+                        pill.addEventListener('click', function () {
+                            selectStyle(this);
+                        });
+                        pill.addEventListener('keydown', function (e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                selectStyle(this);
+                            }
+                        });
+                    });
+
+                    // Upload slot interactions
+                    var uploadSlots = doc.querySelectorAll('.upload-slot');
+                    uploadSlots.forEach(function (slot) {
+                        slot.addEventListener('click', function () {
+                            if (this.classList.contains('empty')) {
+                                alert('File upload dialog would open here');
+                            }
+                        });
+                        slot.addEventListener('keydown', function (e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                this.click();
+                            }
+                        });
+                    });
+
+                    // Sliders ARIA init
+                    var sliders = doc.querySelectorAll('.slider-input');
+                    sliders.forEach(function (slider) {
+                        slider.addEventListener('input', function () {
+                            this.setAttribute('aria-valuenow', this.value);
+                        });
+                        slider.setAttribute('aria-valuenow', slider.value);
+                        slider.setAttribute('aria-valuemin', slider.min);
+                        slider.setAttribute('aria-valuemax', slider.max);
+                    });
+
+                    // Generate button
+                    var generateBtn = doc.querySelector('.btn-header');
+                    if (generateBtn) {
+                        generateBtn.addEventListener('click', function () {
+                            alert('Generating character with current settings...');
+                        });
+                    }
+
+                    // Keyboard navigation for character grid (keeps previous approach)
+                    var cardArray = Array.from(characterCards);
+                    doc.addEventListener('keydown', function (e) {
+                        if (!doc.activeElement || !doc.activeElement.classList.contains('character-card')) {
+                           ?[TRUNCATED]
