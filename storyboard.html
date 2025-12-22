@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PanelForge Storyboard - Arrange and review panels, thumbnails and loading placeholders for your comic storyboard.">
+    <meta name="keywords" content="storyboard, comic panels, thumbnails, panel editor, PanelForge">
+    <link rel="canonical" href="https://panelforge.com/storyboard">
+    <title>Storyboard - PanelForge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Reset & base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html,body { height: 100%; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0A0E27;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background art & glows (preserve visual style) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://im.runware.ai/image/ws/2/ii/7db296f5-4a26-4633-8e11-2e115940331d.jpg') center center / cover no-repeat fixed;
+            opacity: 0.3;
+            z-index: -2;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(107,46,159,0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(217,70,239,0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(6,182,212,0.15) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-curve { position: fixed; pointer-events: none; z-index: 0; border-radius: 50%; filter: blur(30px); }
+        .curve-1 { top: -8%; right: -6%; width: 620px; height: 620px; background: radial-gradient(ellipse at center, rgba(6,182,212,0.35) 0%, transparent 70%); animation: float 8s ease-in-out infinite; }
+        .curve-2 { bottom: -12%; left: -6%; width: 520px; height: 520px; background: radial-gradient(ellipse at center, rgba(217,70,239,0.33) 0%, transparent 70%); animation: float 10s ease-in-out infinite reverse;}
+        .curve-3 { top: 36%; left: 8%; width: 420px; height: 420px; background: radial-gradient(ellipse at center, rgba(107,46,159,0.28) 0%, transparent 70%); animation: float 12s ease-in-out infinite;}
+
+        @keyframes float { 0%,100%{ transform: translate(0,0) scale(1);} 50%{ transform: translate(30px,-30px) scale(1.06);} }
+
+        /* Skip link */
+        .skip-link {
+            position: absolute; top: -40px; left: 0; background: #06B6D4; color: #0A0E27; padding: 8px 16px;
+            text-decoration: none; border-radius: 0 0 4px 0; font-weight: 600; z-index: 100;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* Header with site-wide navigation */
+        header {
+            position: sticky; top: 0; z-index: 60;
+            background: rgba(10,14,39,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(6,182,212,0.15);
+        }
+        .header-container {
+            max-width: 1600px; margin: 0 auto; padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+        }
+        .logo {
+            font-size: 1.35rem; font-weight: 700; color: #06B6D4; text-decoration: none;
+            letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .logo-icon {
+            width: 36px; height: 36px; background: linear-gradient(135deg,#6B2E9F,#D946EF);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        /* Site nav */
+        .site-nav {
+            display: flex; gap: 14px; align-items: center; margin-left: 1rem;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85); text-decoration: none; padding: 8px 12px; border-radius: 8px;
+            font-weight: 500; font-size: 0.95rem; transition: all 0.18s ease;
+        }
+        .nav-link:hover { background: rgba(6,182,212,0.06); color: #06B6D4; transform: translateY(-2px); }
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(107,46,159,0.06));
+            color: #06B6D4; border: 1px solid rgba(6,182,212,0.18); box-shadow: 0 6px 20px rgba(6,182,212,0.06);
+        }
+
+        .header-actions { margin-left: auto; display: flex; gap: 0.75rem; align-items:center; }
+
+        .btn-regenerate-top {
+            padding: 0.5rem 1rem; background: linear-gradient(135deg,#06B6D4,#0891B2);
+            color: #0A0E27; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;
+            transition: all 0.25s ease; box-shadow: 0 6px 22px rgba(6,182,212,0.18);
+            font-size: 0.9rem;
+        }
+        .btn-regenerate-top:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(6,182,212,0.28); }
+
+        main { position: relative; z-index: 1; padding: 2rem 0; min-height: calc(100vh - 100px); }
+
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 2rem; }
+
+        .storyboard-layout { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; margin-top: 1rem; }
+
+        .storyboard-panel {
+            background: linear-gradient(135deg, rgba(10,14,39,0.86) 0%, rgba(27,40,71,0.7) 100%);
+            border: 2px solid; border-image: linear-gradient(135deg,#06B6D4,#6B2E9F) 1;
+            border-radius: 16px; padding: 1.25rem; backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(6,182,212,0.12); position: relative; overflow: hidden;
+        }
+
+        .storyboard-panel::before {
+            content: ''; position: absolute; inset:0; background: linear-gradient(135deg, rgba(6,182,212,0.02), rgba(107,46,159,0.02)); pointer-events:none;
+        }
+
+        /* Controls */
+        .storyboard-controls { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; position:relative; z-index:1; }
+        .left-controls { display:flex; gap:0.5rem; align-items:center; }
+        .zoom-controls { display:flex; gap:0.5rem; align-items:center; }
+        .zoom-btn {
+            width:36px; height:36px; background: rgba(10,14,39,0.8); border:1px solid rgba(6,182,212,0.3);
+            border-radius:8px; color:#06B6D4; cursor:pointer; transition: all 0.2s ease; display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+        }
+        .zoom-btn:hover { border-color: #06B6D4; background: rgba(6,182,212,0.07); box-shadow: 0 0 12px rgba(6,182,212,0.18); }
+
+        .page-actions { display:flex; gap:0.75rem; align-items:center; }
+        .btn-regenerate-page {
+            padding: 0.5rem 1.25rem; background: rgba(6,182,212,0.08); border:1px solid #06B6D4; border-radius:8px; color:#06B6D4;
+            cursor:pointer; transition: all 0.25s ease; font-weight:600; display:flex; gap:0.5rem; align-items:center;
+        }
+        .btn-download, .btn-toggle-loading {
+            width:40px; height:40px; background: rgba(10,14,39,0.8); border:1px solid rgba(6,182,212,0.28); border-radius:8px; color:#06B6D4; display:flex; align-items:center; justify-content:center; cursor:pointer;
+        }
+        .btn-toggle-loading { font-size:0.9rem; }
+
+        /* Top thumbnail strip inside panel (per storyboard design) */
+        .thumbnail-strip-top {
+            display:flex; gap:0.875rem; overflow-x:auto; padding-bottom:0.75rem; margin-bottom:0.75rem; position:relative; z-index:1;
+        }
+        .thumbnail-strip-top::-webkit-scrollbar { height:8px; }
+        .thumbnail-strip-top::-webkit-scrollbar-track { background: rgba(10,14,39,0.6); border-radius:4px;}
+        .thumbnail-strip-top::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.36); border-radius:4px;}
+        .thumb-tile {
+            min-width:96px; width:96px; aspect-ratio: 4/5; border-radius:8px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition: all 0.25s ease; background: rgba(255,255,255,0.03);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .thumb-tile img { width:100%; height:100%; object-fit:cover; display:block; }
+        .thumb-tile:hover { transform: translateY(-6px); border-color:#06B6D4; box-shadow: 0 10px 30px rgba(6,182,212,0.14); }
+
+        /* Page canvas / comic grid (storyboard main area) */
+        .page-canvas {
+            background: linear-gradient(180deg,#EAF0FB 0%, #f1f5f9 100%); border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 1rem;
+        }
+        .canvas-inner {
+            padding: 12px; background: #f8fafc; border-radius:8px;
+        }
+
+        /* Custom storyboard grid: one large main panel left, smaller panels to the right/top/bottom */
+        .story-grid {
+            display: grid; gap: 8px;
+            grid-template-columns: 1fr 320px;
+            grid-template-rows: 220px 140px 140px;
+        }
+
+        /* Panels */
+        .comic-panel {
+            position: relative; overflow: hidden; border-radius: 8px; background: #e2e8f0; display:flex; align-items:center; justify-content:center;
+            min-height: 100px; border: 2px solid rgba(10,14,39,0.04);
+        }
+        .comic-panel img { width:100%; height:100%; object-fit:cover; display:block; }
+
+        /* Layout spans to create large left main area */
+        .comic-panel.main {
+            grid-row: 1 / span 3; grid-column: 1 / 2; min-height: 520px;
+        }
+        .comic-panel.top-right { grid-row: 1 / 2; grid-column: 2 / 3; min-height: 220px; }
+        .comic-panel.middle-right { grid-row: 2 / 3; grid-column: 2 / 3; min-height: 140px; }
+        .comic-panel.bottom-right { grid-row: 3 / 4; grid-column: 2 / 3; min-height: 140px; }
+
+        /* Small inset panels inside right col to mimic stacked frames */
+        .mini-grid {
+            display: grid; gap:8px; grid-template-columns: repeat(3,1fr); grid-auto-rows: 100px; margin-top: 8px;
+        }
+        .mini-panel { border-radius:6px; overflow:hidden; background:#e6eef8; border:1px solid rgba(10,14,39,0.05); }
+
+        /* Overlay actions on hover */
+        .panel-overlay { position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 50%); opacity:0; transition: opacity .25s ease; display:flex; align-items:flex-end; justify-content:center; padding:12px; }
+        .comic-panel:hover .panel-overlay { opacity:1; }
+
+        .btn-regenerate-panel {
+            padding: 0.45rem 0.9rem; background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27; font-weight: 700; border: none; border-radius: 8px; cursor:pointer; font-size:0.85rem; box-shadow: 0 10px 25px rgba(6,182,212,0.18);
+        }
+
+        /* Loading / skeleton states (toggable) */
+        .comic-panel.loading {
+            background: linear-gradient(90deg, rgba(6,182,212,0.06), rgba(217,70,239,0.04), rgba(6,182,212,0.06));
+            position:relative; overflow:hidden;
+        }
+        .comic-panel.loading img { display:none; }
+        .comic-panel .skeleton {
+            position:absolute; inset:12px; border-radius:6px; background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 100%);
+            animation: shimmer 1.6s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-110%); }
+            100% { transform: translateX(110%); }
+        }
+
+        /* Bottom thumbnail strip (keep from preview but adjust sizing to match storyboard look if needed) */
+        .thumbnail-strip {
+            display:flex; gap:1rem; overflow-x:auto; padding:1rem 0; position:relative; z-index:1;
+        }
+        .thumbnail { min-width:80px; width:80px; aspect-ratio: 4/5; border-radius:8px; overflow:hidden; cursor:pointer; transition: all 0.25s ease; border:2px solid transparent; }
+        .thumbnail img { width:100%; height:100%; object-fit:cover; display:block; }
+        .thumbnail.active { border-color:#06B6D4; box-shadow: 0 10px 30px rgba(6,182,212,0.12); transform: translateY(-6px); }
+
+        /* Sidebar (right column) */
+        .sidebar {
+            background: linear-gradient(135deg, rgba(27,40,71,0.5), rgba(10,14,39,0.7));
+            border:1px solid rgba(6,182,212,0.12); border-radius:12px; padding:1.25rem; backdrop-filter: blur(8px);
+            position: sticky; top: 100px; height: fit-content;
+        }
+        .sidebar-title { font-size:1rem; font-weight:700; color:#fff; margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.5px; }
+        .notes-list { display:flex; flex-direction:column; gap:1rem; }
+
+        .note-item { background: rgba(10,14,39,0.5); border:1px solid rgba(107,46,159,0.18); border-radius:8px; padding:0.9rem; }
+        .note-avatar { width:36px; height:36px; border-radius:50%; background: linear-gradient(135deg, rgba(107,46,159,0.4), rgba(217,70,239,0.4)); }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .storyboard-layout { grid-template-columns: 1fr; }
+            .story-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+            .comic-panel.main { grid-row:auto; grid-column:auto; min-height: 380px; }
+            .comic-panel.top-right, .comic-panel.middle-right, .comic-panel.bottom-right { grid-row:auto; grid-column:auto; }
+            .sidebar { position: static; }
+        }
+        @media (max-width:768px) {
+            .header-container { padding: 0.75rem 1rem; }
+            .thumbnail-strip-top { gap:0.6rem; }
+            .thumb-tile { min-width:72px; width:72px; }
+            .thumbnail { min-width:60px; width:60px; }
+            .page-actions { gap:0.5rem; }
+            .btn-regenerate-page { padding:0.45rem 0.9rem; font-size:0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <div class="glow-curve curve-1"></div>
+    <div class="glow-curve curve-2"></div>
+    <div class="glow-curve curve-3"></div>
+
+    <header class="pf-header" data-pf="header" role="banner" aria-label="Site header">
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PanelForge Home">
+                <div class="logo-icon">?</div>
+                <span>PanelForge</span>
+            </a>
+
+            <nav class="site-nav pf-nav" data-pf="nav" role="navigation" aria-label="Main navigation">
+                <a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="home" href="index.html">Home</a>
+                <a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="create" href="create.html">Create</a>
+                <a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="studio" href="studio.html">Studio</a>
+                <a class="nav-link active pf-nav-link" data-pf="nav-link" data-nav-key="storyboard" href="storyboard.html" aria-current="page">Storyboard</a>
+                <a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="preview" href="preview.html">Preview</a>
+                <a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="export" href="export.html">Export</a>
+                <a class="nav-link pf-nav-link pf-login" data-pf="login" data-nav-key="create" href="create.html">Login</a>
+            </nav>
+
+            <div class="header-actions" role="group" aria-label="Header actions">
+                <button class="btn-regenerate-top" title="Regenerate">Regenerate</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main" class="pf-main" data-pf="main" role="main">
+        <div class="container">
+            <div class="storyboard-layout">
+                <div class="storyboard-panel" aria-labelledby="storyboard-heading">
+                    <h1 id="storyboard-heading" style="font-size:1.1rem; font-weight:700; margin-bottom:0.75rem;">Storyboard</h1>
+
+                    <div class="storyboard-controls">
+                        <div class="left-controls">
+                            <div class="zoom-controls" role="group" aria-label="Zoom controls">
+                                <button class="zoom-btn" aria-label="Fit to screen">?</button>
+                                <button class="zoom-btn" aria-label="Zoom out">?</button>
+                                <button class="zoom-btn" aria-label="Zoom in">+</button>
+                            </div>
+                            <div style="width:8px;"></div>
+                            <div class="page-actions">
+                                <button class="btn-regenerate-page" title="Regenerate storyboard">
+                                    <span>?</span>
+                                    <span style="margin-left:6px;">Regenerate</span>
+                                </button>
+                                <button class="btn-toggle-loading" title="Toggle loading placeholders" aria-pressed="false">?</button>
+                                <button class="btn-download" title="Download storyboard" aria-label="Download">?</button>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            <div style="color:rgba(255,255,255,0.7); font-weight:600; font-size:0.95rem;">Page 1</div>
+                        </div>
+                    </div>
+
+                    <!-- Top thumbnail strip (repeatable comic tiles per design) -->
+                    <div class="thumbnail-strip-top pf-grid" data-pf="grid" aria-label="Panel thumbnails">
+                        <div class="thumb-tile pf-card" data-thumb="1" data-card-id="1" title="Panel A">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Panel thumbnail A">
+                        </div>
+                        <div class="thumb-tile pf-card" data-thumb="2" data-card-id="2" title="Panel B">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Panel thumbnail B">
+                        </div>
+                        <div class="thumb-tile pf-card" data-thumb="3" data-card-id="3" title="Panel C">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Panel thumbnail C">
+                        </div>
+                        <div class="thumb-tile pf-card" data-thumb="4" data-card-id="4" title="Panel D">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Panel thumbnail D">
+                        </div>
+                        <div class="thumb-tile pf-card" data-thumb="5" data-card-id="5" title="Panel E">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Panel thumbnail E">
+                        </div>
+                        <div class="thumb-tile pf-card" data-thumb="6" data-card-id="6" title="Panel F">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Panel thumbnail F">
+                        </div>
+                    </div>
+
+                    <!-- Page canvas / grid of panels (static placeholders) -->
+                    <div class="page-canvas" role="region" aria-label="Storyboard canvas">
+                        <div class="canvas-inner">
+                            <div class="story-grid pf-grid" data-pf="grid" aria-hidden="false">
+                                <!-- Main large panel -->
+                                <div class="comic-panel main pf-card" data-panel="1" data-card-id="1">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Main panel">
+                                    <div class="panel-overlay">
+                                        <button class="btn-regenerate-panel">? Regenerate</button>
+                                    </div>
+                                </div>
+
+                                <!-- Right column: top -->
+                                <div class="comic-panel top-right loading pf-card" data-panel="2" data-loading="true" data-card-id="2" aria-live="polite">
+                                    <!-- skeleton to match design glowing loading -->
+                                    <div class="skeleton" aria-hidden="true"></div>
+                                    <div class="panel-overlay">
+                                        <button class="btn-regenerate-panel">? Regenerate</button>
+                                    </div>
+                                </div>
+
+                                <!-- Middle right stacked small panels -->
+                                <div class="comic-panel middle-right pf-card" data-panel="3" data-card-id="3">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Middle right panel">
+                                    <div class="panel-overlay">
+                                        <button class="btn-regenerate-panel">? Regenerate</button>
+                                    </div>
+                                </div>
+
+                                <!-- Bottom right stacked small panels -->
+                                <div class="comic-panel bottom-right loading pf-card" data-panel="4" data-loading="true" data-card-id="4">
+                                    <div class="skeleton" aria-hidden="true"></div>
+                                    <div class="panel-overlay">
+                                        <button class="btn-regenerate-panel">? Regenerate</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- A mini grid below main area to mimic additional smaller panels (per design) -->
+                            <div class="mini-grid" aria-label="Additional panels">
+                                <div class="mini-panel pf-card" data-panel="5" data-card-id="5">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Mini panel 1" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div class="mini-panel pf-card" data-panel="6" data-card-id="6">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Mini panel 2" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div class="mini-panel pf-card" data-panel="7" data-card-id="7">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Mini panel 3" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div class="mini-panel pf-card" data-panel="8" data-card-id="8">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Mini panel 4" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div class="mini-panel pf-card" data-panel="9" data-card-id="9">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Mini panel 5" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                                <div class="mini-panel pf-card" data-panel="10" data-card-id="10">
+                                    <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Mini panel 6" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom paging & thumbnail strip (kept for navigation) -->
+                    <nav class="page-navigation" aria-label="Page navigation" style="margin-top:0.5rem;">
+                        <button class="page-btn active" aria-pressed="true">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                    </nav>
+
+                    <input type="range" class="page-slider" min="1" max="5" value="1" aria-label="Page slider" style="margin-top:0.75rem;">
+
+                    <div class="thumbnail-strip" aria-label="Storyboard pages">
+                        <div class="thumbnail active" data-page="1">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 1 thumbnail">
+                        </div>
+                        <div class="thumbnail" data-page="2">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 2 thumbnail">
+                        </div>
+                        <div class="thumbnail" data-page="3">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 3 thumbnail">
+                        </div>
+                        <div class="thumbnail" data-page="4">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 4 thumbnail">
+                        </div>
+                        <div class="thumbnail" data-page="5">
+                            <img src="https://im.runware.ai/image/ws/2/ii/0a56d500-319c-4650-a3f8-b60427281d4f.jpg" alt="Page 5 thumbnail">
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="sidebar" aria-labelledby="sidebar-title">
+                    <h2 id="sidebar-title" class="sidebar-title">Comments & Notes</h2>
+                    <div class="notes-list">
+                        <div class="note-item">
+                            <div style="display:flex; gap:0.75rem; align-items:center; margin-bottom:0.5rem;">
+                                <div class="note-avatar" aria-hidden="true"></div>
+                                <div style="font-weight:600;">Story Note</div>
+                            </div>
+                            <div style="color:rgba(255,255,255,0.8); font-size:0.95rem;">Place notes for the storyboard here. Keep bright highlights for important directions.</div>
+                        </div>
+                        <div class="note-item">
+                            <div style="display:flex; gap:0.75rem; align-items:center; margin-bottom:0.5rem;">
+                                <div class="note-avatar" aria-hidden="true"></div>
+                                <div style="font-weight:600;">Panel Feedback</div>
+                            </div>
+                            <div style="color:rgba(255,255,255,0.8); font-size:0.95rem;">Mark panels that need regenerating or additional detail.</div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // Page navigation & thumbnails (preserve functionality from preview)
+            const pageButtons = document.querySelectorAll('.page-btn');
+            const pageSlider = document.querySelector('.page-slider');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+
+            function setActivePage(pageNum) {
+                pageButtons.forEach((btn, index) => {
+                    btn.classList.toggle('active', index + 1 === pageNum);
+                    btn.setAttribute('aria-pressed', String(index + 1 === pageNum));
+                });
+                thumbnails.forEach((thumb, index) => {
+                    thumb.classList.toggle('active', index + 1 === pageNum);
+                });
+                if (pageSlider) pageSlider.value = pageNum;
+            }
+
+            pageButtons.forEach((btn, index) => {
+                btn.addEventListener('click', function() {
+                    setActivePage(index + 1);
+                });
+            });
+
+            if (pageSlider) {
+                pageSlider.addEventListener('input', function() {
+                    setActivePage(parseInt(this.value));
+                });
+            }
+
+            thumbnails.forEach((thumb, index) => {
+                thumb.addEventListener('click', function() {
+                    setActivePage(index + 1);
+                    this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                });
+            });
+
+            // Top thumbnail strip interactions - center the clicked thumb and optionally highlight related panel
+            const topThumbs = document.querySelectorAll('.thumb-tile');
+            topThumbs.forEach((t) => {
+                t.addEventListener('click', function() {
+                    topThumbs.forEach(x => x.classList.remove('active'));
+                    this.classList.add('active');
+                    this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                });
+            });
+
+            // Regenerate buttons (top, page, panel)
+            const regenerateTopBtn = document.querySelector('.btn-regenerate-top');
+            const regeneratePageBtn = document.querySelector('.btn-regenerate-page');
+            const regeneratePanelBtns = document.querySelectorAll('.btn-regenerate-panel');
+
+            function showRegenerateMessage(target) {
+                // Using simple alert for placeholder behavior; replace with app notification as needed
+                alert(`Regenerating ${target}...`);
+            }
+
+            if (regenerateTopBtn) {
+                regenerateTopBtn.addEventListener('click', () => showRegenerateMessage('storyboard'));
+            }
+            if (regeneratePageBtn) {
+                regeneratePageBtn.addEventListener('click', () => showRegenerateMessage('page'));
+            }
+            regeneratePanelBtns.forEach((btn, index) => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showRegenerateMessage(`panel ${index + 1}`);
+                });
+            });
+
+            // Zoom controls (preserve behavior)
+            const zoomBtns = document.querySelectorAll('.zoom-btn');
+            let zoomLevel = 1;
+            zoomBtns.forEach((btn, index) => {
+                btn.addEventListener('click', function() {
+                    if (index === 0) {
+                        zoomLevel = 1; // Fit to screen
+                    } else if (index === 1) {
+                        zoomLevel = Math.max(0.5, zoomLevel - 0.1); // Zoom out
+                    } else if (index === 2) {
+                        zoomLevel = Math.min(2, zoomLevel + 0.1); // Zoom in
+                    }
+                    const canvas = document.querySelector('.page-canvas');
+                    if (canvas) {
+                        canvas.style.transform = `scale(${zoomLevel})`;
+                        canvas.style.transformOrigin = 'top center';
+                    }
+                });
+            });
+
+            // Download button (placeholder)
+            const downloadBtn = document.querySelector('.btn-download');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    alert('Downloading storyboard preview...');
+                });
+            }
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                const currentPage = parseInt(pageSlider ? pageSlider.value : 1);
+                const maxPage = pageButtons.length || 1;
+                if (e.key === 'ArrowLeft' && currentPage > 1) {
+                    setActivePage(currentPage - 1);
+                } else if (e.key === 'ArrowRight' && currentPage < maxPage) {
+                    setActivePage(currentPage + 1);
+                }
+            });
+
+            // Toggle loading placeholders (new behavior)
+            const toggleLoadingBtn = document.querySelector('.btn-toggle-loading');
+            const loadingPanels = document.querySelectorAll('.comic-panel[data-loading="true"]');
+
+            function setLoadingState(state) {
+                // Toggles loading class on elements that were marked as data-loading
+                loadingPanels.forEach(panel => {
+                    panel.classList.toggle('loading', state);
+                    // update aria attributes
+                    if (state) {
+                        panel.setAttribute('aria-busy', 'true');
+                    } else {
+                        panel.removeAttribute('aria-busy');
+                    }
+                });
+                if (toggleLoadingBtn) {
+                    toggleLoadingBtn.setAttribute('aria-pressed', String(state));
+                }
+            }
+
+            // Initialize current state from panels: if any panel has loading class, consider toggled ON
+            let initialLoading = false;
+            loadingPanels.forEach(p => { if (p.classList.contains('loading')) initialLoading = true; });
+            if (toggleLoadingBtn) {
+                toggleLoadingBtn.setAttribute('aria-pressed', String(initialLoading));
+            }
+
+            // Attach toggle click
+            if (toggleLoadingBtn) {
+                toggleLoadingBtn.addEventListener('click', function() {
+                    const pressed = this.getAttribute('aria-pressed') === 'true';
+                    setLoadingState(!pressed);
+                });
+            }
+
+            // Mini interaction: clicking a thumbnail in top strip highlights a panel (if matching data-thumb)
+            topThumbs.forEach(t => {
+                t.addEventListener('click', function() {
+                    const id = this.getAttribute('data-thumb');
+                    // Map to panels in a simple way (1->main, 2->top-right, 3->middle-right, 4->bottom-right)
+                    const map = {
+                        '1': '.comic-panel.main',
+                        '2': '.comic-panel.top-right',
+                        '3': '.comic-panel.middle-right',
+                        '4': '.comic-panel.bottom-right',
+                        '5': '.mini-panel[data-panel="5"]',
+                        '6': '.mini-panel[data-panel="6"]'
+                    };
+                    const selector = map[id];
+                    if (!selector) return;
+                    const target = document.querySelector(selector);
+                    if (target) {
+                        // flash highlight
+                        target.style.boxShadow = '0 0 0 4px rgba(6,182,212,0.14)';
+                        setTimeout(() => { target.style.boxShadow = ''; }, 900);
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            });
+
+            // Accessibility: allow thumbnails to be focusable via keyboard
+            document.querySelectorAll('.thumb-tile, .thumbnail').forEach(el => {
+                el.setAttribute('tabindex', '0');
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        el.click();
+                    }
+                });
+            });
+
+        })();
+    </script>
+
+    <script src="app.js" defer></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            if (window.app && typeof window.app.init === 'function') {
+                try {
+                    window.app.init(document);
+                } catch (e) {
+                    // non-fatal if app init fails
+                    console.error('app.init error:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
