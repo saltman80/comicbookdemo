@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PanelForge Create - Transform yourself into a comic character with AI-powered tools. Upload photos, turn pets into characters, or generate from text prompts.">
+    <meta name="keywords" content="comic creation, character generator, AI transformation, photo to comic, pet character, text to character">
+    <link rel="canonical" href="https://panelforge.com/create">
+    <title>Create Character - PanelForge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0A0E27;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://im.runware.ai/image/ws/2/ii/7db296f5-4a26-4633-8e11-2e115940331d.jpg') center center / cover no-repeat fixed;
+            opacity: 0.3;
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(107, 46, 159, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(217, 70, 239, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-curve {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .curve-1 {
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.4) 0%, transparent 70%);
+            filter: blur(40px);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .curve-2 {
+            bottom: -10%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(ellipse at center, rgba(217, 70, 239, 0.35) 0%, transparent 70%);
+            filter: blur(35px);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        .curve-3 {
+            top: 40%;
+            left: 10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(107, 46, 159, 0.3) 0%, transparent 70%);
+            filter: blur(30px);
+            border-radius: 50%;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #06B6D4;
+            color: #0A0E27;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            font-weight: 600;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #06B6D4;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #D946EF;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #06B6D4;
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1.25rem;
+            background: transparent;
+            color: #06B6D4;
+            border: 1px solid #06B6D4;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-login:hover {
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-account {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #6B2E9F;
+            background: transparent;
+            color: #D946EF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn-account:hover {
+            background: rgba(107, 46, 159, 0.2);
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid #06B6D4;
+            color: #06B6D4;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.2rem;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        #hero {
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.7) 0%, rgba(10, 14, 39, 0.8) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            border-radius: 16px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(107, 46, 159, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #ffffff;
+            text-shadow: 0 2px 20px rgba(6, 182, 212, 0.3);
+            text-transform: capitalize;
+        }
+
+        section {
+            padding: 3rem 0;
+        }
+
+        .creation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .creation-card {
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.6) 0%, rgba(10, 14, 39, 0.7) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .creation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(107, 46, 159, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .creation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.3);
+        }
+
+        .creation-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(6, 182, 212, 0.2);
+            border: 2px solid #06B6D4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #06B6D4;
+            flex-shrink: 0;
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: capitalize;
+        }
+
+        .upload-area {
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px dashed rgba(6, 182, 212, 0.4);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: #06B6D4;
+            background: rgba(10, 14, 39, 0.8);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #06B6D4;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .upload-area p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .preview-area {
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(27, 40, 71, 0.4) 0%, rgba(107, 46, 159, 0.2) 100%);
+        }
+
+        .preview-icon {
+            font-size: 5rem;
+            opacity: 0.3;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .thumbnail {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            border: 2px solid rgba(107, 46, 159, 0.4);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(10, 14, 39, 0.6);
+        }
+
+        .thumbnail:hover {
+            border-color: #D946EF;
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .style-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .style-toggle-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .style-toggle-label strong {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .style-toggle-label span {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 31px;
+        }
+
+        .text-area {
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            min-height: 250px;
+            font-family: inherit;
+            resize: vertical;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: #06B6D4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-generate {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #06B6D4, #0891B2);
+            color: #0A0E27;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1.5rem;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(6, 182, 212, 0.6);
+        }
+
+        footer {
+            background: rgba(10, 14, 39, 0.9);
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 3rem 0 2rem;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: #06B6D4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #06B6D4;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding: 2rem 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 1rem;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: rgba(10, 14, 39, 0.98);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: left 0.3s ease;
+                border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .creation-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <div class="glow-curve curve-1"></div>
+    <div class="glow-curve curve-2"></div>
+    <div class="glow-curve curve-3"></div>
+
+    <header class="pf-header" data-pf="header" role="banner">
+        <div class="header-container">
+            <a href="index.html" class="logo" aria-label="PanelForge Home">Panel<span>Forge</span></a>
+            <nav class="pf-nav" data-pf="nav" role="navigation" aria-label="Main navigation">
+                <button class="mobile-menu-toggle pf-mobile-toggle" data-pf="mobile-toggle" aria-expanded="false" aria-controls="pf-mobile-menu" aria-label="Toggle navigation menu">
+                    ?
+                </button>
+                <ul class="nav-menu pf-mobile-menu" id="pf-mobile-menu" role="menu" aria-hidden="true">
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="home" href="index.html">Home</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="create" href="create.html">Create</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="studio" href="studio.html">Studio</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="storyboard" href="storyboard.html">Storyboard</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="preview" href="preview.html">Preview</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="export" href="export.html">Export</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="create.html" class="btn-login pf-login" data-pf="login">Login</a>
+                    <button class="btn-account" aria-label="User account">?</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="pf-main" data-pf="main" role="main">
+        <section id="hero" class="pf-hero" data-pf="hero" aria-labelledby="hero-title">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-image pf-hero-image" data-pf="hero-image">
+                        <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Turn Yourself Into a Comic Book" loading="eager">
+                    </div>
+                    <div class="hero-text">
+                        <h1 id="hero-title">Turn Yourself Into a Comic Book</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="creation-tools" aria-labelledby="tools-title">
+            <div class="container">
+                <div class="creation-grid pf-grid" data-pf="grid">
+                    <article class="creation-card pf-card" data-pf="card" data-card-id="upload">
+                        <div class="card-header">
+                            <span class="card-number">1</span>
+                            <h3>Upload a photo, transform into a comic character</h3>
+                        </div>
+                        <div class="upload-area pf-card-select" data-pf="card-select" tabindex="0" role="button" aria-label="Upload photo area">
+                            <div class="upload-icon">?</div>
+                            <p>Drag & Drop or<br>Click to Upload</p>
+                        </div>
+                        <div class="thumbnail-grid">
+                            <div class="thumbnail">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Character style 1" loading="lazy">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Character style 2" loading="lazy">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Character style 3" loading="lazy">
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="creation-card pf-card" data-pf="card" data-card-id="pets">
+                        <div class="card-header">
+                            <span class="card-number">2</span>
+                            <h3>Turn pets into comic characters</h3>
+                        </div>
+                        <div class="preview-area pf-card-select" data-pf="card-select">
+                            <div class="preview-icon">?</div>
+                        </div>
+                        <div class="style-toggle">
+                            <div class="style-toggle-label">
+                                <strong>Style Toggle</strong>
+                                <span>Classic / Modern</span>
+                            </div>
+                            <div class="toggle-switch" role="switch" aria-checked="false" tabindex="0"></div>
+                        </div>
+                    </article>
+
+                    <article class="creation-card pf-card" data-pf="card" data-card-id="metum">
+                        <div class="card-header">
+                            <span class="card-number">2</span>
+                            <h3>Create a metum into comic character</h3>
+                        </div>
+                        <div class="preview-area pf-card-select" data-pf="card-select">
+                            <div class="preview-icon">?</div>
+                        </div>
+                        <div class="thumbnail-grid">
+                            <div class="thumbnail">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Character style 1" loading="lazy">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://im.runware.ai/image/ws/2/ii/ef549fac-1013-4e1e-ac13-e1eab2744bc5.jpg" alt="Character style 2" loading="lazy">
+                            </div>
+                            <div class="thumbnail">
+                                <img src="https://im.runware.ai/image/ws/2/ii/8cf60bf6-56d6-4cd0-a086-1a4eb000d555.jpg" alt="Character style 3" loading="lazy">
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="creation-card pf-card" data-pf="card" data-card-id="text">
+                        <div class="card-header">
+                            <span class="card-number">3</span>
+                            <h3>Create a character from a text prompt</h3>
+                        </div>
+                        <textarea class="text-area" placeholder="A cybernetic warrior with glowing blue armor in a neon city..." aria-label="Character description prompt"></textarea>
+                        <button class="btn-generate pf-card-select" data-pf="card-select">Generate</button>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PanelForge</h3>
+                <p>AI-powered comic creation platform for the next generation of storytellers.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="index.html#about">About</a>
+                <a href="index.html#contact">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#tutorials">Tutorials</a>
+                <a href="#documentation">Documentation</a>
+                <a href="#community">Community</a>
+                <a href="#support">Support</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: hello@panelforge.com</p>
+                <p>Support: support@panelforge.com</p>
+                <p>Follow us on social media</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 PanelForge. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
