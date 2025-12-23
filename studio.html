@@ -69,28 +69,53 @@
             display: flex; justify-content: space-between; align-items: center; gap: 1rem;
         }
         .logo {
-            font-size: 1.35rem; font-weight: 700; color: #06B6D4; text-decoration: none;
-            letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem;
-        }
-        .logo-icon {
-            width: 36px; height: 36px; background: linear-gradient(135deg,#6B2E9F,#D946EF);
-            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-        }
-        /* Site nav */
-        .site-nav {
-            display: flex; gap: 14px; align-items: center; margin-left: 1rem;
-        }
-        .nav-link {
-            color: rgba(255,255,255,0.85); text-decoration: none; padding: 8px 12px; border-radius: 8px;
-            font-weight: 500; font-size: 0.95rem; transition: all 0.18s ease;
-        }
-        .nav-link:hover { background: rgba(6,182,212,0.06); color: #06B6D4; transform: translateY(-2px); }
-        .nav-link.active {
-            background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(107,46,159,0.06));
-            color: #06B6D4; border: 1px solid rgba(6,182,212,0.18); box-shadow: 0 6px 20px rgba(6,182,212,0.06);
+            font-size: 1.5rem; font-weight: 700; color: #06B6D4; text-decoration: none;
+            letter-spacing: -0.5px;
         }
 
-        .header-actions { margin-left: auto; display: flex; gap: 0.75rem; align-items:center; }
+        .logo span { color: #D946EF; }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active,
+        .nav-menu a.is-active {
+            color: #06B6D4;
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+        }
+
+        .nav-actions { margin-left: auto; display: flex; gap: 0.75rem; align-items:center; }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid #06B6D4;
+            color: #06B6D4;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.2rem;
+        }
 
         .btn-header {
             padding: 0.5rem 1rem; background: linear-gradient(135deg,#06B6D4,#0891B2);
@@ -441,8 +466,20 @@
 
         @media (max-width: 768px) {
             .header-container { padding: 0.75rem 1rem; flex-wrap: wrap; }
-            .site-nav { gap: 8px; width: 100%; order: 3; justify-content: center; }
-            .nav-link { padding: 6px 10px; font-size: 0.85rem; }
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: rgba(10, 14, 39, 0.98);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: left 0.3s ease;
+                border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+            }
+            .nav-menu.is-open { left: 0; }
+            .mobile-menu-toggle { display: block; }
             .character-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
             .container { padding: 0 1rem; }
         }
@@ -461,26 +498,24 @@
 
     <header data-pf="header" role="banner" aria-label="Site header">
         <div class="header-container">
-            <a href="index.html" class="logo" aria-label="PanelForge Home">
-                <div class="logo-icon">?</div>
-                <span>PanelForge</span>
-            </a>
+            <a href="index.html" class="logo" aria-label="PanelForge Home">Panel<span>Forge</span></a>
 
-            <nav class="site-nav pf-nav" data-pf="nav" role="navigation" aria-label="Main navigation">
-                <a class="nav-link" data-pf="nav-link" data-nav-key="home" href="index.html">Home</a>
-                <a class="nav-link" data-pf="nav-link" data-nav-key="create" href="create.html">Create</a>
-                <a class="nav-link active" data-pf="nav-link" data-nav-key="studio" href="studio.html" aria-current="page">Studio</a>
-                <a class="nav-link" data-pf="nav-link" data-nav-key="storyboard" href="storyboard.html">Storyboard</a>
-                <a class="nav-link" data-pf="nav-link" data-nav-key="preview" href="preview.html">Preview</a>
-                <a class="nav-link" data-pf="nav-link" data-nav-key="export" href="export.html">Export</a>
-                <a class="nav-link pf-login" data-pf="nav-link" data-pf-login data-pf="login" data-pf-login2 href="create.html" data-pf="login">Login</a>
+            <nav class="pf-nav" data-pf="nav" role="navigation" aria-label="Main navigation">
+                <button class="mobile-menu-toggle pf-mobile-toggle" data-pf="mobile-toggle" aria-expanded="false" aria-controls="pf-mobile-menu" aria-label="Toggle navigation menu">
+                    ?
+                </button>
+                <ul class="nav-menu pf-mobile-menu" id="pf-mobile-menu" role="menu" aria-hidden="true">
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="home" href="index.html">Home</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="create" href="create.html">Create</a></li>
+                    <li><a class="nav-link pf-nav-link active" data-pf="nav-link" data-nav-key="studio" href="studio.html" aria-current="page">Studio</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="storyboard" href="storyboard.html">Storyboard</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="preview" href="preview.html">Preview</a></li>
+                    <li><a class="nav-link pf-nav-link" data-pf="nav-link" data-nav-key="export" href="export.html">Export</a></li>
+                </ul>
+                <div class="nav-actions" role="group" aria-label="Header actions">
+                    <button class="btn-header" title="Generate character">Generate</button>
+                </div>
             </nav>
-
-            <button class="pf-mobile-toggle" data-pf="mobile-toggle" aria-controls="pf-mobile-menu" aria-expanded="false" aria-label="Toggle mobile menu"></button>
-
-            <div class="header-actions" role="group" aria-label="Header actions">
-                <button class="btn-header" title="Generate character">Generate</button>
-            </div>
         </div>
     </header>
 
@@ -883,11 +918,13 @@
                 // Toggle mobile menu placeholder
                 function toggleMobileMenu() {
                     var btn = doc.querySelector('[data-pf="mobile-toggle"]');
-                    if (!btn) return;
-                    var expanded = btn.getAttribute('aria-expanded') === 'true';
-                    btn.setAttribute('aria-expanded', (!expanded).toString());
-                    // Toggle a visible state on body for consumers
-                    document.body.classList.toggle('is-open', !expanded);
+                    var menu = doc.querySelector('#pf-mobile-menu');
+                    if (!btn || !menu) return;
+
+                    var willOpen = !menu.classList.contains('is-open');
+                    menu.classList.toggle('is-open', willOpen);
+                    menu.setAttribute('aria-hidden', (!willOpen).toString());
+                    btn.setAttribute('aria-expanded', willOpen.toString());
                 }
 
                 // Activate a card by cardId (data-card-id)
