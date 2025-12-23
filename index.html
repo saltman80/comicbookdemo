@@ -349,129 +349,206 @@
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
+            gap: 2.25rem;
+            margin-top: 3.5rem;
         }
 
         .tool-card {
-            background: linear-gradient(135deg, rgba(27, 40, 71, 0.6) 0%, rgba(10, 14, 39, 0.7) 100%);
-            border: 2px solid;
-            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
-            border-radius: 12px;
-            padding: 2.5rem 2rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            background: linear-gradient(150deg, rgba(18, 26, 55, 0.95) 0%, rgba(9, 14, 37, 0.95) 100%);
+            border-radius: 16px;
+            padding: 2.75rem 2.25rem;
+            backdrop-filter: blur(16px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            box-shadow: 0 20px 45px rgba(4, 6, 16, 0.35);
         }
 
         .tool-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(107, 46, 159, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.9), rgba(217, 70, 239, 0.7));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.55;
+        }
+
+        .tool-card::after {
+            content: '';
+            position: absolute;
+            inset: 14px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(217, 70, 239, 0.05));
+            opacity: 0.8;
+            pointer-events: none;
         }
 
         .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.3);
-        }
-
-        .tool-card:hover::before {
-            opacity: 1;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 55px rgba(6, 182, 212, 0.25);
         }
 
         .tool-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 1.5rem;
+            width: 88px;
+            height: 88px;
+            margin-bottom: 1.75rem;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            border-radius: 16px;
+            background: radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.3), rgba(217, 70, 239, 0.1));
+            border: 1px solid rgba(6, 182, 212, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
         }
 
         .tool-icon img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .tool-card--character .tool-icon {
+            width: 110px;
+            height: 110px;
+            padding: 6px;
+        }
+
+        .tool-card--character .tool-icon img {
+            object-position: center top;
         }
 
         .tool-card h3 {
-            font-size: 1.5rem;
+            font-size: 1.55rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #06B6D4;
+            color: #20D6F1;
             position: relative;
-            z-index: 1;
+            z-index: 2;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .tool-card p {
             font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.75);
+            color: rgba(255, 255, 255, 0.72);
             font-weight: 300;
-            line-height: 1.6;
+            line-height: 1.65;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         .controls-section {
-            background: linear-gradient(135deg, rgba(27, 40, 71, 0.4) 0%, rgba(10, 14, 39, 0.5) 100%);
-            border: 2px solid;
-            border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
-            border-radius: 16px;
-            padding: 3rem;
-            backdrop-filter: blur(10px);
+            background: linear-gradient(140deg, rgba(14, 21, 44, 0.95) 0%, rgba(9, 12, 35, 0.9) 100%);
+            border-radius: 18px;
+            padding: 3.25rem;
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            box-shadow: 0 24px 60px rgba(6, 182, 212, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .controls-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(217, 70, 239, 0.08));
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         .controls-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.6rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
+            gap: 0.6rem;
         }
 
-        .control-group label {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 0.5rem;
-            font-weight: 400;
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .control-field {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .control-group input,
         .control-group select,
         .control-group textarea {
-            background: rgba(10, 14, 39, 0.6);
-            border: 1px solid rgba(6, 182, 212, 0.3);
+            width: 100%;
+            background: rgba(9, 12, 32, 0.7);
+            border: 1px solid rgba(6, 182, 212, 0.35);
             color: #ffffff;
-            padding: 0.875rem 1rem;
-            border-radius: 8px;
+            padding: 0.95rem 2.8rem 0.95rem 1rem;
+            border-radius: 12px;
             font-size: 0.95rem;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 0 12px rgba(6, 182, 212, 0.1);
+        }
+
+        .control-group select {
+            appearance: none;
         }
 
         .control-group input:focus,
         .control-group select:focus,
         .control-group textarea:focus {
             outline: none;
-            border-color: #06B6D4;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            border-color: rgba(32, 214, 241, 0.9);
+            box-shadow: 0 0 18px rgba(6, 182, 212, 0.35);
         }
 
         .control-group textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
+        }
+
+        .control-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(6, 182, 212, 0.6);
+            color: #20D6F1;
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+            pointer-events: none;
+        }
+
+        .control-field textarea + .control-icon {
+            top: 18px;
+            transform: none;
         }
 
         .control-group-full {
@@ -483,6 +560,8 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
         }
 
         .btn-secondary {
@@ -947,7 +1026,7 @@
                     <h2 id="tools-title">FEATURED TOOLS</h2>
                 </div>
                 <div class="tools-grid">
-                    <article class="tool-card">
+                    <article class="tool-card tool-card--character">
                         <div class="tool-icon">
                             <img src="https://im.runware.ai/image/ws/2/ii/eed154b4-0029-4cfd-ab45-9346c82a21a0.jpg" alt="AI Character Generator icon" loading="lazy">
                         </div>
@@ -992,30 +1071,69 @@
                 <div class="controls-section">
                     <form class="controls-grid" aria-label="Comic creation controls">
                         <div class="control-group">
-                            <label for="prompt">Enter Prompt...</label>
-                            <input type="text" id="prompt" name="prompt" placeholder="Describe your scene or character..." aria-required="true">
+                            <label for="prompt" class="visually-hidden">Enter Prompt...</label>
+                            <div class="control-field">
+                                <input type="text" id="prompt" name="prompt" placeholder="Enter Prompt..." aria-required="true">
+                                <span class="control-icon" aria-hidden="true">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 20L6.5 19.5L19 7L17 5L4.5 17.5L4 20Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 6L18 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                         <div class="control-group">
-                            <label for="art-style">Select Art Style...</label>
-                            <select id="art-style" name="art-style" aria-required="true">
-                                <option value="">Choose style...</option>
-                                <option value="comic">Comic Book</option>
-                                <option value="manga">Manga</option>
-                                <option value="realistic">Realistic</option>
-                                <option value="cartoon">Cartoon</option>
-                            </select>
+                            <label for="art-style" class="visually-hidden">Select Art Style...</label>
+                            <div class="control-field">
+                                <select id="art-style" name="art-style" aria-required="true">
+                                    <option value="">Choose style...</option>
+                                    <option value="comic">Comic Book</option>
+                                    <option value="manga">Manga</option>
+                                    <option value="realistic">Realistic</option>
+                                    <option value="cartoon">Cartoon</option>
+                                </select>
+                                <span class="control-icon" aria-hidden="true">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                         <div class="control-group">
-                            <label for="character-name">Character Name...</label>
-                            <input type="text" id="character-name" name="character-name" placeholder="Enter character name...">
+                            <label for="character-name" class="visually-hidden">Character Name...</label>
+                            <div class="control-field">
+                                <input type="text" id="character-name" name="character-name" placeholder="Character Name...">
+                                <span class="control-icon" aria-hidden="true">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+                                        <path d="M5 19C6.5 16.5 9 15 12 15C15 15 17.5 16.5 19 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                         <div class="control-group control-group-full">
-                            <label for="scene-description">Scene Description...</label>
-                            <textarea id="scene-description" name="scene-description" placeholder="Describe the scene, mood, and action..."></textarea>
+                            <label for="scene-description" class="visually-hidden">Scene Description...</label>
+                            <div class="control-field">
+                                <textarea id="scene-description" name="scene-description" placeholder="Scene Description..."></textarea>
+                                <span class="control-icon" aria-hidden="true">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                                        <path d="M8 10H16M8 14H13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                         <div class="control-group">
-                            <label for="page-title">Page Title...</label>
-                            <input type="text" id="page-title" name="page-title" placeholder="Enter page or chapter title...">
+                            <label for="page-title" class="visually-hidden">Page Title...</label>
+                            <div class="control-field">
+                                <input type="text" id="page-title" name="page-title" placeholder="Page Title...">
+                                <span class="control-icon" aria-hidden="true">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 4H15L19 8V20H7V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                                        <path d="M15 4V8H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                     </form>
                     <div class="button-group">
