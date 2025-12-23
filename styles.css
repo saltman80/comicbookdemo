@@ -148,6 +148,10 @@ html, body {
   position: relative;
 }
 
+main, .pf-main, .pf-main[data-pf="main"] {
+  padding-top: 50px;
+}
+
 /* Site-wide neon translucent background */
 body::before {
   content: '';
