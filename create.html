@@ -243,17 +243,22 @@
 
         #hero {
             padding: 3rem 0;
-            text-align: center;
+            text-align: left;
         }
 
         .hero-content {
-            background: linear-gradient(135deg, rgba(27, 40, 71, 0.7) 0%, rgba(10, 14, 39, 0.8) 100%);
+            background: linear-gradient(90deg, rgba(5, 8, 20, 0.98) 0%, rgba(5, 8, 20, 0.88) 38%, rgba(5, 8, 20, 0.4) 62%, rgba(5, 8, 20, 0.1) 78%, rgba(5, 8, 20, 0) 100%),
+                        url('https://im.runware.ai/image/ws/2/ii/628e644a-0275-4c1e-b645-8abb2e381ba2.jpg') center right / cover no-repeat;
             border: 2px solid;
             border-image: linear-gradient(135deg, #06B6D4, #6B2E9F) 1;
-            border-radius: 16px;
-            padding: 3rem;
+            border-radius: 18px;
+            padding: 3.5rem 3rem;
+            min-height: 360px;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
+            box-shadow: 0 10px 36px rgba(6, 182, 212, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -261,27 +266,19 @@
         .hero-content::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(107, 46, 159, 0.1) 100%);
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.18) 0%, rgba(107, 46, 159, 0.2) 45%, rgba(6, 182, 212, 0.1) 100%);
             pointer-events: none;
         }
 
-        .hero-image {
-            width: 100%;
-            height: 400px;
+        .hero-content::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
             border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 2rem;
-        }
-
-        .hero-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            box-shadow: inset 0 0 24px rgba(6, 182, 212, 0.2);
+            pointer-events: none;
         }
 
         .hero-text {
@@ -289,10 +286,14 @@
             z-index: 1;
         }
 
+        .hero-text {
+            max-width: 520px;
+        }
+
         .hero-text h1 {
             font-size: 3rem;
             font-weight: 700;
-            line-height: 1.2;
+            line-height: 1.15;
             color: #ffffff;
             text-shadow: 0 2px 20px rgba(6, 182, 212, 0.3);
             text-transform: capitalize;
@@ -622,6 +623,15 @@
                 padding: 1rem;
             }
 
+            .hero-content {
+                padding: 2.5rem 2rem;
+                min-height: 260px;
+            }
+
+            .hero-text {
+                max-width: 100%;
+            }
+
             .nav-menu {
                 position: fixed;
                 top: 70px;
@@ -691,9 +701,6 @@
         <section id="hero" class="pf-hero" data-pf="hero" aria-labelledby="hero-title">
             <div class="container">
                 <div class="hero-content">
-                    <div class="hero-image pf-hero-image" data-pf="hero-image">
-                        <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Turn Yourself Into a Comic Book" loading="eager">
-                    </div>
                     <div class="hero-text">
                         <h1 id="hero-title">Turn Yourself Into a Comic Book</h1>
                     </div>
