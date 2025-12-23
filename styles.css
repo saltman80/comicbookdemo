@@ -180,11 +180,35 @@ header,
   font-weight: var(--font-weight-bold);
   color: var(--color-electric-cyan);
   text-decoration: none;
-  letter-spacing: -0.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(6, 182, 212, 0.6), 0 0 22px rgba(217, 70, 239, 0.35);
+  display: inline-flex;
+  align-items: center;
 }
 
 .logo span {
   color: var(--color-vibrant-magenta);
+  text-shadow: 0 0 14px rgba(217, 70, 239, 0.6), 0 0 24px rgba(6, 182, 212, 0.25);
+  margin-left: 0.08em;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .logo {
+    background: linear-gradient(90deg, #7cf9ff 0%, #5ee1ff 45%, #b55bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .logo span {
+    background: linear-gradient(90deg, #b55bff 0%, #ff7bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
 }
 
 nav,
