@@ -329,6 +329,23 @@
             padding: 1rem;
         }
 
+        .single-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .single-preview .comic-panel {
+            width: min(420px, 100%);
+            aspect-ratio: 2 / 3;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+            border: 1px solid rgba(15, 23, 42, 0.2);
+            background: #0A0E27;
+        }
+
         .comic-panel {
             position: relative;
             aspect-ratio: 3/4;
@@ -703,81 +720,9 @@
                     </div>
 
                     <div class="page-canvas">
-                        <div class="comic-grid" data-pf="grid">
+                        <div class="single-preview" data-pf="grid">
                             <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-1">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 1">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-2">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 2">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-3">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 3">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel wide pf-card" data-pf="card" data-card-id="panel-4">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 4">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-5">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 5">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-6">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 6">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-7">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 7">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-8">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 8">
-                                <div class="panel-overlay">
-                                    <button class="btn-regenerate-panel">
-                                        <span>?</span>
-                                        Regenerate
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comic-panel pf-card" data-pf="card" data-card-id="panel-9">
-                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic panel 9">
+                                <img src="https://im.runware.ai/image/ws/2/ii/f4b413e2-1c2e-4833-9d39-d3e58a0adca7.jpg" alt="Comic preview page">
                                 <div class="panel-overlay">
                                     <button class="btn-regenerate-panel">
                                         <span>?</span>
