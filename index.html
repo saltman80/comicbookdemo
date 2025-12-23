@@ -363,6 +363,10 @@
             overflow: hidden;
             border: 1px solid rgba(6, 182, 212, 0.4);
             box-shadow: 0 20px 45px rgba(4, 6, 16, 0.35);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
         .tool-card::before {
@@ -394,35 +398,65 @@
         }
 
         .tool-icon {
-            width: 88px;
-            height: 88px;
-            margin-bottom: 1.75rem;
+            width: 92px;
+            height: 92px;
             position: relative;
             z-index: 2;
-            border-radius: 16px;
-            background: radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.3), rgba(217, 70, 239, 0.1));
+            border-radius: 18px;
+            background: radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.4), rgba(217, 70, 239, 0.15));
             border: 1px solid rgba(6, 182, 212, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.35);
         }
 
-        .tool-icon img {
+        .tool-icon svg {
+            width: 70%;
+            height: 70%;
+        }
+
+        .tool-card__media {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .tool-card__media img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 12px;
-        }
-
-        .tool-card--character .tool-icon {
-            width: 110px;
-            height: 110px;
-            padding: 6px;
-        }
-
-        .tool-card--character .tool-icon img {
             object-position: center top;
+        }
+
+        .tool-card__content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .tool-card--character {
+            padding: 0;
+            justify-content: flex-end;
+        }
+
+        .tool-card--character::after {
+            inset: 0;
+            background: linear-gradient(180deg, rgba(8, 12, 30, 0.1) 0%, rgba(8, 12, 30, 0.7) 60%, rgba(8, 12, 30, 0.95) 100%);
+            opacity: 1;
+        }
+
+        .tool-card--character .tool-card__content {
+            padding: 2.5rem;
+            background: linear-gradient(180deg, rgba(8, 12, 30, 0) 0%, rgba(8, 12, 30, 0.75) 55%, rgba(8, 12, 30, 0.95) 100%);
+        }
+
+        .tool-card--character h3 {
+            color: #ffffff;
+            text-shadow: 0 0 18px rgba(6, 182, 212, 0.35);
+        }
+
+        .tool-card--character p {
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .tool-card h3 {
@@ -1027,11 +1061,13 @@
                 </div>
                 <div class="tools-grid">
                     <article class="tool-card tool-card--character">
-                        <div class="tool-icon">
+                        <div class="tool-card__media">
                             <img src="https://im.runware.ai/image/ws/2/ii/eed154b4-0029-4cfd-ab45-9346c82a21a0.jpg" alt="AI Character Generator icon" loading="lazy">
                         </div>
-                        <h3>AI CHARACTER GENERATOR</h3>
-                        <p>Create unique characters with detailed descriptions. Customize appearance, powers, and style.</p>
+                        <div class="tool-card__content">
+                            <h3>AI CHARACTER GENERATOR</h3>
+                            <p>Create unique characters with detailed descriptions. Customize appearance, powers, and style.</p>
+                        </div>
                     </article>
                     <article class="tool-card">
                         <div class="tool-icon">
@@ -1044,8 +1080,10 @@
                                 <rect x="56" y="32" width="20" height="20" rx="2" stroke="#D946EF" stroke-width="2"/>
                             </svg>
                         </div>
-                        <h3>SMART PANEL LAYOUTS</h3>
-                        <p>Instantly generate dynamic panel grids and compositions. Optimize flow and storytelling.</p>
+                        <div class="tool-card__content">
+                            <h3>SMART PANEL LAYOUTS</h3>
+                            <p>Instantly generate dynamic panel grids and compositions. Optimize flow and storytelling.</p>
+                        </div>
                     </article>
                     <article class="tool-card">
                         <div class="tool-icon">
@@ -1056,8 +1094,10 @@
                                 <circle cx="60" cy="40" r="8" stroke="#6B2E9F" stroke-width="2"/>
                             </svg>
                         </div>
-                        <h3>DIALOGUE & SCRIPTING</h3>
-                        <p>AI assisted scriptwriting and dialogue generation. Enhance your narrative voice.</p>
+                        <div class="tool-card__content">
+                            <h3>DIALOGUE & SCRIPTING</h3>
+                            <p>AI assisted scriptwriting and dialogue generation. Enhance your narrative voice.</p>
+                        </div>
                     </article>
                 </div>
             </div>
